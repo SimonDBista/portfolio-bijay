@@ -1,0 +1,329 @@
+export interface WorkExperience {
+  id: string;
+  role: string;
+  company: string;
+  location: string;
+  period: string;
+  shift?: string;
+  highlights: string[];
+}
+
+export interface EducationCert {
+  id: string;
+  title: string;
+  institution: string;
+  year: string;
+  grade?: string;
+  description: string;
+}
+
+export interface Specialty {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  iconName: string;
+  skills: string[];
+}
+
+export interface ChefProfile {
+  name: string;
+  titles: string[];
+  tagline: string;
+  bioImage?: string;
+  aboutTitle?: string;
+  aboutSubtitle?: string;
+  editorialQuote: string;
+  bioSummary: string;
+  fullPhilosophy: string[];
+  stats: {
+    label: string;
+    value: string;
+    subtext: string;
+  }[];
+  contact: {
+    email: string;
+    phones: string[];
+    location: string;
+    home: string;
+    nationality: string;
+    languages: { language: string; level: string }[];
+  };
+  experiences: WorkExperience[];
+  education: EducationCert[];
+  specialties: Specialty[];
+  references: {
+    name: string;
+    title: string;
+    organization: string;
+    email: string;
+    phone: string;
+  }[];
+}
+
+export const chefData: ChefProfile = {
+  name: "Bijaya Ghimire",
+  titles: [
+    "Chef de Partie (CDP)",
+    "Culinary Arts Instructor",
+    "Modern Gastronomy Specialist",
+  ],
+  tagline: "Harmonizing Precision Culinary Techniques, Rigorous Food Safety, and Evocative Visual Plating.",
+  aboutSubtitle: "Curated Biography • Authentic Craft",
+  aboutTitle: "A Journey of Discipline, Precision, & Plating Artistry",
+  editorialQuote: "To cook is to orchestrate nature’s raw beauty with disciplined technique, transforming honest ingredients into memorable sensory moments.",
+  bioSummary: "Motivated and detail-oriented Chef with over 8 years of verified experience in culinary operations, fine dining kitchens, food safety management, and kitchen team leadership. From luxury Himalayan resorts to international culinary stages in Kuwait and academic lecture halls, Chef Bijaya embodies the pinnacle of disciplined culinary craft.",
+  fullPhilosophy: [
+    "Over an eight-year career encompassing luxury hospitality, high-volume international culinary brigades, and higher education mentorship, Chef Bijaya Ghimire has cultivated a kitchen philosophy rooted in architectural precision, spotless food safety compliance, and artistic plating.",
+    "Trained formally at the Kathmandu Institute of Hospitality Management and holding Level 3 Certification in Food Hygiene & Safety, Chef Bijaya views culinary art through a dual lens: unyielding respect for classic culinary fundamentals, blended with contemporary culinary aesthetics.",
+    "Whether orchestrating high-intensity line service at Swiss Forevermore in Kuwait, designing seasonal menus for dynamic cafes in Nepal, or training future culinary professionals at Kumakh College, his commitment remains uncompromising: excellence on every plate, respect for every ingredient, and clarity in every flavor profile."
+  ],
+  stats: [
+    {
+      value: "8+",
+      label: "Years of Culinary Mastery",
+      subtext: "From Commis to CDP and Culinary Instructor"
+    },
+    {
+      value: "Level 3",
+      label: "Food Hygiene & Safety",
+      subtext: "Training Express Certified (2022)"
+    },
+    {
+      value: "International",
+      label: "Kitchen Experience",
+      subtext: "Kuwait & Premier Himalayan Luxury Resorts"
+    },
+    {
+      value: "100%",
+      label: "Authentic Craftsmanship",
+      subtext: "Full HACCP compliance & team leadership"
+    }
+  ],
+  contact: {
+    email: "ghimirebijay89@gmail.com",
+    phones: ["(+977) 9861387820", "(+965) 41024985"],
+    location: "Banepa-02, Kavre, Nepal / Open to International Opportunities",
+    home: "Banepa-02, Kavre, Nepal",
+    nationality: "Nepalese",
+    languages: [
+      { language: "Nepali", level: "Native Tongue" },
+      { language: "English", level: "Professional Working Proficiency (B1/B2)" },
+      { language: "Hindi", level: "Fluent Proficiency (B2/C1)" },
+    ]
+  },
+  experiences: [
+    {
+      id: "swiss-forevermore",
+      company: "Swiss Forevermore",
+      location: "Kuwait",
+      role: "Chef de Partie (CDP)",
+      period: "Dec 2023 – Nov 2025",
+      highlights: [
+        "Directed daily kitchen operations and structured optimized work schedules for kitchen team members.",
+        "Coordinated seamlessly with team members to ensure maximum speed, precision, and station efficiency.",
+        "Handled comprehensive inventory management and requisitioned supplies directly from the central kitchen.",
+        "Upheld rigorous international food quality benchmarks and signature presentation standards on every pass."
+      ]
+    },
+    {
+      id: "kumakh-food-cafe",
+      company: "Kumakh Food Cafe",
+      location: "Nepal",
+      role: "Chef",
+      shift: "Evening Shift",
+      period: "Dec 2021 – Nov 2023",
+      highlights: [
+        "Planned, directed, and oversaw all food preparation and culinary execution during peak evening services.",
+        "Created and modernized specialized menus in accordance with strict taste, visual, and quality standards.",
+        "Calculated precise food and labor expenditures, optimizing margins without compromising ingredient caliber.",
+        "Supervised, mentored, and instructed junior kitchen personnel; directed kitchen equipment procurement and upkeep."
+      ]
+    },
+    {
+      id: "kumakh-college",
+      company: "Kumakh College of Management & Technical Science Pvt. Ltd",
+      location: "Nepal",
+      role: "Chef Instructor",
+      shift: "Morning Shift",
+      period: "Dec 2021 – Nov 2023",
+      highlights: [
+        "Delivered structured, curriculum-based professional culinary instruction and practical demonstrations.",
+        "Guided aspiring hospitality students both personally and professionally to prepare them for global kitchens.",
+        "Engineered engaging lesson plans, practical station exercises, and comprehensive instructional materials.",
+        "Fostered a culture of creative innovation, hygienic standards, and real-world kitchen discipline."
+      ]
+    },
+    {
+      id: "anty-hub",
+      company: "Anty Hub Restaurant",
+      location: "Nepal",
+      role: "Chef",
+      period: "Jul 2020 – Sep 2021",
+      highlights: [
+        "Oversaw all kitchen operations, workstation hygiene, and junior kitchen staff coordination.",
+        "Designed innovative signature dishes and appealing seasonal menu concepts.",
+        "Enforced strict food safety, sanitation, and temperature control regulations across all food handling.",
+        "Trained and managed junior culinary staff in modern preparation and plating methods."
+      ]
+    },
+    {
+      id: "mandala-cafe",
+      company: "Mandala Cafe and Restaurant",
+      location: "Nepal",
+      role: "Chef",
+      period: "Jul 2020 – Sep 2021",
+      highlights: [
+        "Executed daily culinary preparation and hot-line cooking in coordination with senior culinary staff.",
+        "Maintained pristine sanitation and organization across all kitchen workstations and storage zones.",
+        "Supported plating and presentation, guaranteeing visual consistency, taste balance, and precision.",
+        "Expanded multi-cuisine techniques and contributed to smooth, high-velocity kitchen workflows."
+      ]
+    },
+    {
+      id: "mystic-mountain-commis1",
+      company: "Hotel Mystic Mountain",
+      location: "Nagarkot, Nepal",
+      role: "Commis I",
+      period: "2018 – 2020",
+      highlights: [
+        "Prepared and fabricated premium artisanal produce, crisp vegetables, fresh herbs, and garden salads.",
+        "Cooked hot culinary staples including meats, gourmet potatoes, egg creations, and artisanal pastas.",
+        "Assembled delicate sandwiches, appetizers, and garnishes adhering to visual and taste specifications.",
+        "Served dishes strictly calibrated to exact temperature, texture, and visual aesthetic standards.",
+        "Maintained station areas in an immaculate, safe, and HACCP-compliant condition."
+      ]
+    },
+    {
+      id: "mystic-mountain-commis2",
+      company: "Hotel Mystic Mountain",
+      location: "Nagarkot, Nepal",
+      role: "Commis II",
+      period: "May 2018 – Nov 2018",
+      highlights: [
+        "Maintained highest standards of culinary execution strictly following Executive Chef guidelines.",
+        "Prepared, cooked, and presented section food items ensuring uncompromised consistency.",
+        "Monitored section stock movement, handled daily ordering, and controlled portion wastage.",
+        "Assisted in achieving food cost targets and maintaining luxury resort kitchen benchmarks."
+      ]
+    },
+    {
+      id: "mystic-mountain-trainee",
+      company: "Hotel Mystic Mountain",
+      location: "Nagarkot, Nepal",
+      role: "Culinary Trainee (Internship)",
+      period: "Dec 2017 – Apr 2018",
+      highlights: [
+        "Assisted senior culinary masters in extensive food preparation and banquet cooking.",
+        "Executed precision ingredient preparation: washing, knife cuts, weighing, and marinating.",
+        "Followed exact recipes and standardized portion guidelines with meticulous care.",
+        "Supported kitchen cleanliness, sanitation stations, and fine dining food plating."
+      ]
+    }
+  ],
+  education: [
+    {
+      id: "hygiene-level-3",
+      title: "Food Hygiene and Safety Level 3",
+      institution: "Training Express",
+      year: "2022",
+      description: "Advanced certification covering HACCP principles, food safety management systems, hazard prevention, safe food storage, and temperature controls."
+    },
+    {
+      id: "professional-cook",
+      title: "Professional Cook Certification",
+      institution: "Kathmandu Institute of Hospitality Management",
+      year: "2018",
+      description: "Comprehensive professional culinary training in classic knife skills, kitchen sanitation, continental cooking, sauce crafting, and kitchen management."
+    },
+    {
+      id: "plus-two",
+      title: "+2 (Higher Secondary Education)",
+      institution: "Shree Swet Baraha Secondary School",
+      year: "2020",
+      grade: "2.45 GPA",
+      description: "Higher secondary education completed in Nepal."
+    },
+    {
+      id: "see",
+      title: "Secondary Education Examination (SEE)",
+      institution: "Shree Swet Baraha Higher Secondary School",
+      year: "2017",
+      grade: "2.56 GPA",
+      description: "Secondary education credentials."
+    }
+  ],
+  specialties: [
+    {
+      id: "fine-dining-plating",
+      title: "Art of Plating & Visual Gastronomy",
+      subtitle: "Editorial Presentation & Balance",
+      description: "Transforming dishes into visual poetry. Utilizing color contrasts, micro-herbs, emulsified reductions, and modern geometric layouts to elevate every serving into an artistic dining experience.",
+      iconName: "Palette",
+      skills: ["Architectural Plating", "Color Harmony", "Delicate Saucing", "Texture Juxtaposition"]
+    },
+    {
+      id: "multi-cuisine",
+      title: "Multi-Cuisine Mastery",
+      subtitle: "Continental, European & Asian Fusion",
+      description: "A deep repertoire cultivated through international experience in Kuwait and Himalayan luxury resorts. Adept at continental classics, delicate pastas, Asian spice profiles, and contemporary fusion.",
+      iconName: "UtensilsCrossed",
+      skills: ["Continental Specialties", "Modern Asian Flavors", "Artisanal Pastas", "Sauce Reductions"]
+    },
+    {
+      id: "menu-engineering",
+      title: "Menu Planning & Cost Optimization",
+      subtitle: "Flavor Innovation & Profitability",
+      description: "Developing comprehensive seasonal menus that balance culinary intrigue with sound food costing, portion control, yield management, and kitchen operational viability.",
+      iconName: "BookOpen",
+      skills: ["Seasonal Menu Design", "Recipe Standardization", "Food Cost Control", "Yield Analysis"]
+    },
+    {
+      id: "food-safety",
+      title: "Food Hygiene & HACCP Leadership",
+      subtitle: "Level 3 Certified Standards",
+      description: "Uncompromising dedication to food safety protocols, temperature logging, cross-contamination prevention, and maintaining sterile, world-class kitchen environments.",
+      iconName: "ShieldCheck",
+      skills: ["Level 3 Food Hygiene", "HACCP Systems", "Temperature Control", "Sterile Sanitation"]
+    },
+    {
+      id: "kitchen-leadership",
+      title: "Brigade Leadership & Logistics",
+      subtitle: "Central Kitchen Supply & Coordination",
+      description: "Managing daily line stations, coordinating brigade members under high-pressure ticket flows, structuring work rosters, and executing seamless central kitchen requisitioning.",
+      iconName: "Users",
+      skills: ["Brigade Management", "Work Scheduling", "Station Efficiency", "Inventory Logistics"]
+    },
+    {
+      id: "culinary-pedagogy",
+      title: "Culinary Mentorship & Instruction",
+      subtitle: "Empowering Next-Generation Chefs",
+      description: "Drawing upon years of formal instruction at Kumakh College to train, guide, and elevate junior kitchen staff in classic culinary discipline, knife techniques, and professional pride.",
+      iconName: "GraduationCap",
+      skills: ["Staff Training", "Demonstration Plating", "Curriculum Instruction", "Technique Coaching"]
+    }
+  ],
+  references: [
+    {
+      name: "Hari Bhatta",
+      title: "F and B Operations Manager",
+      organization: "Hanuman Restaurant Darwin",
+      email: "Harihmbhatta@gmail.com",
+      phone: "0452640894"
+    },
+    {
+      name: "Wissam Wafa",
+      title: "Operation Manager",
+      organization: "Forevermore Kuwait",
+      email: "wissam@swishhh.net",
+      phone: "97379825"
+    },
+    {
+      name: "Dinesh Timalsina",
+      title: "Chef de Partie (CDP)",
+      organization: "Colleague & Culinary Peer",
+      email: "timalsina6891@gmail.com",
+      phone: "976892093"
+    }
+  ]
+};

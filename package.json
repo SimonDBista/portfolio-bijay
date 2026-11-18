@@ -1,0 +1,36 @@
+{
+  "name": "portfolio-bijay",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.6.6",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.6.2",
+    "bcryptjs": "^3.0.3",
+    "framer-motion": "^14.14.0",
+    "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^1.75.0",
+    "next": "^14.2.18",
+    "postcss": "^8.5.33",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sharp": "^0.35.5",
+    "tailwindcss": "^3.4.14"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}
