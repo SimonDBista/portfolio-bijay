@@ -65,17 +65,17 @@ export default function ExperienceTimeline({ profile = fallbackChefData }: Exper
 
         {/* TAB 1: WORK EXPERIENCE TIMELINE */}
         {activeTab === 'experience' && (
-          <div className="relative border-l border-[#c9a96e]/30 ml-3 sm:ml-6 md:ml-32 space-y-10 sm:space-y-12 pb-6">
+          <div className="relative border-l border-[#c9a96e]/30 ml-3 sm:ml-6 md:ml-48 lg:ml-52 space-y-10 sm:space-y-12 pb-6">
             {experiences.map((exp) => (
-              <div key={exp.id} className="relative pl-6 sm:pl-8 md:pl-12 group">
+              <div key={exp.id} className="relative pl-6 sm:pl-8 md:pl-10 lg:pl-12 group">
                 {/* Timeline Node Icon */}
                 <div className="absolute -left-[15px] sm:-left-[17px] top-1.5 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#121217] border-2 border-[#c9a96e] flex items-center justify-center text-[#c9a96e] group-hover:scale-110 group-hover:bg-[#c9a96e] group-hover:text-[#09090b] transition-all shadow-lg">
                   <Briefcase className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 </div>
 
-                {/* Period Badge for desktop */}
-                <div className="hidden md:block absolute -left-48 top-2 text-right w-40">
-                  <span className="text-xs uppercase tracking-[0.15em] text-[#c9a96e] font-mono font-medium block">
+                {/* Period Badge for desktop & laptop */}
+                <div className="hidden md:block absolute -left-44 lg:-left-48 top-2 text-right w-36 lg:w-40">
+                  <span className="text-xs uppercase tracking-[0.12em] lg:tracking-[0.15em] text-[#c9a96e] font-mono font-medium block">
                     {exp.period}
                   </span>
                   <span className="text-[11px] text-[#8e8a80] block mt-0.5">
@@ -84,7 +84,7 @@ export default function ExperienceTimeline({ profile = fallbackChefData }: Exper
                 </div>
 
                 {/* Experience Card */}
-                <div className="bg-[#111116] border border-white/5 p-6 md:p-8 hover:border-[#c9a96e]/40 transition-all duration-300 shadow-xl">
+                <div className="bg-[#111116] border border-white/5 p-6 lg:p-8 hover:border-[#c9a96e]/40 transition-all duration-300 shadow-xl">
                   {/* Mobile Period */}
                   <div className="md:hidden flex items-center space-x-3 mb-2 text-xs text-[#c9a96e] font-mono">
                     <Calendar className="w-3.5 h-3.5" />

@@ -135,7 +135,7 @@ export default function HeroSlideshow() {
         </div>
 
         {/* Chef's Actual Name */}
-        <h1 className="font-serif text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-light tracking-[0.06em] sm:tracking-[0.14em] text-[#f4efe6] uppercase mb-3 sm:mb-4 [text-shadow:_0_4px_24px_rgba(0,0,0,0.9)] max-w-full">
+        <h1 className="font-serif text-3xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-light tracking-[0.06em] sm:tracking-[0.14em] text-[#f4efe6] uppercase mb-3 sm:mb-4 [text-shadow:_0_4px_24px_rgba(0,0,0,0.9)] max-w-full">
           <span className="block text-[11px] sm:text-sm md:text-base font-sans tracking-[0.25em] sm:tracking-[0.45em] text-[#c9a96e] mb-1.5 sm:mb-2 font-normal">
             Executive Chef
           </span>
@@ -152,7 +152,7 @@ export default function HeroSlideshow() {
         </div>
 
         {/* Powerful Elegant Introduction */}
-        <p className="max-w-2xl font-sans text-xs sm:text-base md:text-lg text-[#ded8cd] leading-relaxed font-light mb-6 sm:mb-10 tracking-wide text-balance [text-shadow:_0_2px_12px_rgba(0,0,0,0.95)] px-2 sm:px-0">
+        <p className="max-w-2xl font-sans text-xs sm:text-sm md:text-base lg:text-lg text-[#ded8cd] leading-relaxed font-light mb-6 sm:mb-8 lg:mb-10 tracking-wide text-balance [text-shadow:_0_2px_12px_rgba(0,0,0,0.95)] px-2 sm:px-0">
           Harmonizing disciplined Himalayan fundamentals with high-intensity international kitchen brigades in Kuwait. 
           Sculpting elevated gastronomy where technical mastery meets evocative plating.
         </p>

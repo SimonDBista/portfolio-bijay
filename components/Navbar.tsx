@@ -84,14 +84,14 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden lg:flex items-center space-x-5 xl:space-x-8">
             {navItems.map((item) => {
               const isActive = activeSection === item.href.replace('#', '');
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`text-xs uppercase tracking-[0.25em] transition-all relative py-1 ${
+                  className={`text-[11px] xl:text-xs uppercase tracking-[0.18em] xl:tracking-[0.25em] transition-all relative py-1 ${
                     isActive
                       ? 'text-[#c9a96e] font-semibold'
                       : 'text-[#e2ded6]/80 hover:text-white'
@@ -107,11 +107,11 @@ export default function Navbar() {
           </nav>
 
           {/* Action CTAs */}
-          <div className="hidden lg:flex items-center space-x-4">
+          <div className="hidden lg:flex items-center space-x-3 xl:space-x-4">
             <a
               href="/docs/Bijaya_Ghimire_Executive_Chef_CV.pdf"
               download
-              className="inline-flex items-center space-x-2 px-4 py-2 border border-[#c9a96e]/40 hover:border-[#c9a96e] text-xs uppercase tracking-[0.2em] text-[#e8dfcf] hover:text-white transition-all bg-black/30 hover:bg-[#c9a96e]/10"
+              className="inline-flex items-center space-x-1.5 xl:space-x-2 px-3 xl:px-4 py-2 border border-[#c9a96e]/40 hover:border-[#c9a96e] text-[11px] xl:text-xs uppercase tracking-[0.15em] xl:tracking-[0.2em] text-[#e8dfcf] hover:text-white transition-all bg-black/30 hover:bg-[#c9a96e]/10"
             >
               <span>Download CV</span>
               <ArrowUpRight className="w-3.5 h-3.5 text-[#c9a96e]" />
@@ -127,7 +127,7 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu Toggle */}
-          <div className="flex items-center space-x-2 md:hidden">
+          <div className="flex items-center space-x-2 lg:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
@@ -141,7 +141,7 @@ export default function Navbar() {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-[#09090b]/98 backdrop-blur-2xl flex flex-col justify-between px-6 sm:px-8 py-20 md:hidden animate-fade-in overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-[#09090b]/98 backdrop-blur-2xl flex flex-col justify-between px-6 sm:px-8 py-20 lg:hidden animate-fade-in overflow-y-auto">
           <div className="flex flex-col space-y-5">
             <div className="flex items-center justify-between border-b border-[#c9a96e]/20 pb-3">
               <span className="text-xs uppercase tracking-[0.3em] text-[#c9a96e]">

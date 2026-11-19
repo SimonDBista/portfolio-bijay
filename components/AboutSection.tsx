@@ -102,16 +102,16 @@ export default function AboutSection({ profile = fallbackChefData }: AboutSectio
             </div>
 
             {/* Four Proven Core Metrics */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 pt-6 border-t border-white/10">
+            <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 pt-6 border-t border-white/10">
               {profile.stats.map((stat, idx) => (
                 <div key={idx} className="bg-[#121217] p-3 sm:p-4 border border-white/5 flex flex-col justify-between">
                   <span className="font-serif text-xl sm:text-2xl md:text-3xl text-[#c9a96e] font-light">
                     {stat.value}
                   </span>
-                  <span className="text-[11px] sm:text-xs font-semibold text-[#f4efe6] uppercase tracking-wider mt-1 line-clamp-1">
+                  <span className="text-[11px] sm:text-xs font-semibold text-[#f4efe6] uppercase tracking-wider mt-1">
                     {stat.label}
                   </span>
-                  <span className="text-[10px] sm:text-[11px] text-[#8e8a80] mt-1 line-clamp-2">
+                  <span className="text-[10px] sm:text-[11px] text-[#8e8a80] mt-1 leading-normal">
                     {stat.subtext}
                   </span>
                 </div>
