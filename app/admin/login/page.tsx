@@ -7,7 +7,7 @@ import { Lock, ArrowLeft, ShieldAlert, KeyRound, ArrowRight } from 'lucide-react
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState('admin');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -91,6 +91,7 @@ export default function AdminLoginPage() {
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter administrator username"
               className="w-full bg-[#16161e] border border-white/10 px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#c9a96e] transition-colors"
             />
           </div>
@@ -127,10 +128,10 @@ export default function AdminLoginPage() {
           </button>
         </form>
 
-        {/* Credentials reminder for evaluation */}
+        {/* Security Notice */}
         <div className="mt-8 pt-6 border-t border-white/5 text-center">
-          <p className="text-[11px] text-[#8c887e]">
-            System Credential Hint: <code className="text-[#c9a96e]">admin</code> / <code className="text-[#c9a96e]">ExecutiveChef2026!</code>
+          <p className="text-[11px] text-[#6b675e] uppercase tracking-widest">
+            Protected Console • Authorized Personnel Only
           </p>
         </div>
       </div>

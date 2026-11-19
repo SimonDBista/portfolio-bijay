@@ -136,7 +136,10 @@ export default function HeroSlideshow() {
 
         {/* Chef's Actual Name */}
         <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-light tracking-[0.14em] text-[#f4efe6] uppercase mb-4 [text-shadow:_0_4px_24px_rgba(0,0,0,0.9)]">
-          Bijaya Ghimire
+          <span className="block text-xs sm:text-sm md:text-base font-sans tracking-[0.45em] text-[#c9a96e] mb-2 font-normal">
+            Executive Chef
+          </span>
+          Chef Bijaya Ghimire
         </h1>
 
         {/* Professional Title */}
