@@ -11,21 +11,21 @@ interface AboutSectionProps {
 
 export default function AboutSection({ profile = fallbackChefData }: AboutSectionProps) {
   return (
-    <section id="about" className="py-28 md:py-36 bg-[#0c0c0f] relative overflow-hidden">
+    <section id="about" className="py-16 sm:py-24 md:py-36 bg-[#0c0c0f] relative overflow-hidden">
       {/* Decorative luxury background element */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-[#c9a96e]/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/[0.02] rounded-full blur-3xl pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 relative z-10">
         {/* Section Header */}
-        <div className="flex flex-col items-center text-center mb-16 md:mb-24">
-          <span className="text-xs uppercase tracking-[0.4em] text-[#c9a96e] mb-3 font-medium">
+        <div className="flex flex-col items-center text-center mb-12 sm:mb-16 md:mb-24">
+          <span className="text-xs uppercase tracking-[0.25em] sm:tracking-[0.4em] text-[#c9a96e] mb-3 font-medium">
             {profile.aboutSubtitle || 'Curated Biography • Authentic Craft'}
           </span>
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal tracking-wide text-[#f4efe6] max-w-3xl">
+          <h2 className="font-serif text-2xl sm:text-4xl md:text-5xl font-normal tracking-wide text-[#f4efe6] max-w-3xl">
             {profile.aboutTitle || 'A Journey of Discipline, Precision, & Plating Artistry'}
           </h2>
-          <div className="w-16 h-[1.5px] bg-[#c9a96e] mt-6" />
+          <div className="w-16 h-[1.5px] bg-[#c9a96e] mt-4 sm:mt-6" />
         </div>
 
         {/* Editorial Two-Column Layout */}
@@ -102,16 +102,16 @@ export default function AboutSection({ profile = fallbackChefData }: AboutSectio
             </div>
 
             {/* Four Proven Core Metrics */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-white/10">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 pt-6 border-t border-white/10">
               {profile.stats.map((stat, idx) => (
-                <div key={idx} className="bg-[#121217] p-4 border border-white/5 flex flex-col">
-                  <span className="font-serif text-2xl sm:text-3xl text-[#c9a96e] font-light">
+                <div key={idx} className="bg-[#121217] p-3 sm:p-4 border border-white/5 flex flex-col justify-between">
+                  <span className="font-serif text-xl sm:text-2xl md:text-3xl text-[#c9a96e] font-light">
                     {stat.value}
                   </span>
-                  <span className="text-xs font-semibold text-[#f4efe6] uppercase tracking-wider mt-1">
+                  <span className="text-[11px] sm:text-xs font-semibold text-[#f4efe6] uppercase tracking-wider mt-1 line-clamp-1">
                     {stat.label}
                   </span>
-                  <span className="text-[11px] text-[#8e8a80] mt-1">
+                  <span className="text-[10px] sm:text-[11px] text-[#8e8a80] mt-1 line-clamp-2">
                     {stat.subtext}
                   </span>
                 </div>

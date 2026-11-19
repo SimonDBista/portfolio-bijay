@@ -24,28 +24,28 @@ const iconMap: Record<string, React.ReactNode> = {
 
 export default function SpecialtiesSection() {
   return (
-    <section id="specialties" className="py-28 md:py-36 bg-[#0c0c10] relative">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <section id="specialties" className="py-16 sm:py-24 md:py-36 bg-[#0c0c10] relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
         {/* Section Header */}
-        <div className="flex flex-col items-center text-center mb-16 md:mb-20">
-          <span className="text-xs uppercase tracking-[0.4em] text-[#c9a96e] mb-3 font-medium">
+        <div className="flex flex-col items-center text-center mb-12 sm:mb-16 md:mb-20">
+          <span className="text-xs uppercase tracking-[0.25em] sm:tracking-[0.4em] text-[#c9a96e] mb-3 font-medium">
             Culinary Repertoire &amp; Leadership
           </span>
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal tracking-wide text-[#f4efe6]">
+          <h2 className="font-serif text-2xl sm:text-4xl md:text-5xl font-normal tracking-wide text-[#f4efe6]">
             Disciplined Specialties
           </h2>
-          <div className="w-16 h-[1.5px] bg-[#c9a96e] mt-6 mb-6" />
-          <p className="max-w-2xl text-sm sm:text-base text-[#ded8cd]/80 leading-relaxed font-light">
+          <div className="w-16 h-[1.5px] bg-[#c9a96e] mt-4 sm:mt-6 mb-4 sm:mb-6" />
+          <p className="max-w-2xl text-xs sm:text-sm md:text-base text-[#ded8cd]/80 leading-relaxed font-light">
             Each discipline represents years of hands-on refinement—from high-pressure Gulf commercial lines to mentoring academy cohorts in modern cooking science.
           </p>
         </div>
 
         {/* Editorial Specialties Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {chefData.specialties.map((item, index) => (
             <div
               key={item.id}
-              className="group relative bg-[#111116] border border-white/5 p-8 flex flex-col justify-between hover:border-[#c9a96e]/40 transition-all duration-500 shadow-xl overflow-hidden"
+              className="group relative bg-[#111116] border border-white/5 p-6 sm:p-8 flex flex-col justify-between hover:border-[#c9a96e]/40 transition-all duration-500 shadow-xl overflow-hidden"
             >
               {/* Subtle Luxury Corner Accent */}
               <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-[#c9a96e]/10 to-transparent pointer-events-none group-hover:from-[#c9a96e]/20 transition-all" />

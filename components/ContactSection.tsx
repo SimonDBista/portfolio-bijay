@@ -20,29 +20,29 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-28 md:py-36 bg-[#0c0c10] relative overflow-hidden">
+    <section id="contact" className="py-16 sm:py-24 md:py-36 bg-[#0c0c10] relative overflow-hidden">
       {/* Background accents */}
       <div className="absolute top-1/2 left-0 w-80 h-80 bg-[#c9a96e]/5 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 relative z-10">
         {/* Section Header */}
-        <div className="flex flex-col items-center text-center mb-16 md:mb-20">
-          <span className="text-xs uppercase tracking-[0.4em] text-[#c9a96e] mb-3 font-medium">
+        <div className="flex flex-col items-center text-center mb-12 sm:mb-16 md:mb-20">
+          <span className="text-xs uppercase tracking-[0.25em] sm:tracking-[0.4em] text-[#c9a96e] mb-3 font-medium">
             Professional Inquiries &amp; Collaborations
           </span>
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal tracking-wide text-[#f4efe6]">
+          <h2 className="font-serif text-2xl sm:text-4xl md:text-5xl font-normal tracking-wide text-[#f4efe6]">
             Connect With Chef Bijaya
           </h2>
-          <div className="w-16 h-[1.5px] bg-[#c9a96e] mt-6 mb-6" />
-          <p className="max-w-2xl text-sm sm:text-base text-[#ded8cd]/80 leading-relaxed font-light">
+          <div className="w-16 h-[1.5px] bg-[#c9a96e] mt-4 sm:mt-6 mb-4 sm:mb-6" />
+          <p className="max-w-2xl text-xs sm:text-sm md:text-base text-[#ded8cd]/80 leading-relaxed font-light">
             Available for executive chef engagements, restaurant menu engineering, luxury private dining, and culinary consulting worldwide.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-16 items-start">
           {/* Left Column: Authentic Contact Details & CV Download */}
-          <div className="lg:col-span-5 flex flex-col space-y-8">
-            <div className="bg-[#111116] border border-white/5 p-8 space-y-6 shadow-xl">
+          <div className="lg:col-span-5 flex flex-col space-y-6 sm:space-y-8">
+            <div className="bg-[#111116] border border-white/5 p-6 sm:p-8 space-y-6 shadow-xl">
               <h3 className="font-serif text-2xl text-[#f4efe6] font-normal">
                 Direct Contact
               </h3>

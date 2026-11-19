@@ -85,7 +85,7 @@ export default function HeroSlideshow() {
   return (
     <section
       id="home"
-      className="relative w-full h-screen min-h-[680px] flex items-center justify-center overflow-hidden select-none bg-[#09090b]"
+      className="relative w-full h-[100dvh] min-h-[600px] flex items-center justify-center overflow-hidden select-none bg-[#09090b]"
       aria-label="Chef Bijaya Ghimire Showcase"
     >
       {/* Background Images with Cinematic Ken Burns & Crossfade */}
@@ -125,43 +125,43 @@ export default function HeroSlideshow() {
       </div>
 
       {/* Main Hero Content - Prominent Editorial Typography */}
-      <div className="relative z-20 max-w-5xl mx-auto px-6 md:px-12 text-center flex flex-col items-center justify-center mt-12">
+      <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 md:px-12 text-center flex flex-col items-center justify-center mt-14 sm:mt-12 w-full">
         {/* Subtle Decorative Crest / Badge */}
-        <div className="inline-flex items-center space-x-3 mb-6 px-4 py-1.5 border border-[#c9a96e]/30 bg-black/40 backdrop-blur-md rounded-full">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#c9a96e] animate-ping" />
-          <span className="text-[11px] md:text-xs uppercase tracking-[0.35em] text-[#e8dfcf] font-medium">
+        <div className="inline-flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6 px-3 sm:px-4 py-1.5 border border-[#c9a96e]/30 bg-black/40 backdrop-blur-md rounded-full max-w-full">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#c9a96e] animate-ping shrink-0" />
+          <span className="text-[10px] sm:text-[11px] md:text-xs uppercase tracking-[0.18em] sm:tracking-[0.35em] text-[#e8dfcf] font-medium text-center truncate">
             Over 8 Years of International Culinary Craft
           </span>
         </div>
 
         {/* Chef's Actual Name */}
-        <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-light tracking-[0.14em] text-[#f4efe6] uppercase mb-4 [text-shadow:_0_4px_24px_rgba(0,0,0,0.9)]">
-          <span className="block text-xs sm:text-sm md:text-base font-sans tracking-[0.45em] text-[#c9a96e] mb-2 font-normal">
+        <h1 className="font-serif text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-light tracking-[0.06em] sm:tracking-[0.14em] text-[#f4efe6] uppercase mb-3 sm:mb-4 [text-shadow:_0_4px_24px_rgba(0,0,0,0.9)] max-w-full">
+          <span className="block text-[11px] sm:text-sm md:text-base font-sans tracking-[0.25em] sm:tracking-[0.45em] text-[#c9a96e] mb-1.5 sm:mb-2 font-normal">
             Executive Chef
           </span>
           Chef Bijaya Ghimire
         </h1>
 
         {/* Professional Title */}
-        <div className="flex items-center justify-center space-x-4 mb-6">
-          <span className="h-[1px] w-8 md:w-16 bg-[#c9a96e]/70" />
-          <p className="font-sans text-xs sm:text-sm md:text-base uppercase tracking-[0.4em] text-[#c9a96e] font-medium [text-shadow:_0_2px_10px_rgba(0,0,0,0.9)]">
+        <div className="flex items-center justify-center space-x-2 sm:space-x-4 mb-4 sm:mb-6 max-w-full px-2">
+          <span className="hidden sm:block h-[1px] w-8 md:w-16 bg-[#c9a96e]/70 shrink-0" />
+          <p className="font-sans text-[11px] sm:text-sm md:text-base uppercase tracking-[0.16em] sm:tracking-[0.4em] text-[#c9a96e] font-medium text-center [text-shadow:_0_2px_10px_rgba(0,0,0,0.9)]">
             Chef de Partie &bull; Culinary Specialist &bull; Instructor
           </p>
-          <span className="h-[1px] w-8 md:w-16 bg-[#c9a96e]/70" />
+          <span className="hidden sm:block h-[1px] w-8 md:w-16 bg-[#c9a96e]/70 shrink-0" />
         </div>
 
         {/* Powerful Elegant Introduction */}
-        <p className="max-w-2xl font-sans text-sm sm:text-base md:text-lg text-[#ded8cd] leading-relaxed font-light mb-10 tracking-wide text-balance [text-shadow:_0_2px_12px_rgba(0,0,0,0.95)]">
+        <p className="max-w-2xl font-sans text-xs sm:text-base md:text-lg text-[#ded8cd] leading-relaxed font-light mb-6 sm:mb-10 tracking-wide text-balance [text-shadow:_0_2px_12px_rgba(0,0,0,0.95)] px-2 sm:px-0">
           Harmonizing disciplined Himalayan fundamentals with high-intensity international kitchen brigades in Kuwait. 
           Sculpting elevated gastronomy where technical mastery meets evocative plating.
         </p>
 
         {/* Two Required CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 w-full sm:w-auto px-4 sm:px-0">
           <Link
             href="#experience"
-            className="w-full sm:w-auto px-8 py-3.5 bg-[#c9a96e] hover:bg-[#dfc28d] text-[#09090b] text-xs uppercase tracking-[0.25em] font-semibold transition-all duration-300 shadow-xl hover:shadow-[#c9a96e]/20 flex items-center justify-center space-x-2 group"
+            className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-[#c9a96e] hover:bg-[#dfc28d] text-[#09090b] text-[11px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.25em] font-semibold transition-all duration-300 shadow-xl hover:shadow-[#c9a96e]/20 flex items-center justify-center space-x-2 group"
           >
             <span>Explore My Journey</span>
             <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -169,7 +169,7 @@ export default function HeroSlideshow() {
 
           <Link
             href="#creations"
-            className="w-full sm:w-auto px-8 py-3.5 border border-[#e8dfcf]/40 hover:border-[#c9a96e] bg-black/40 hover:bg-black/60 text-[#f4efe6] hover:text-[#c9a96e] text-xs uppercase tracking-[0.25em] font-medium transition-all duration-300 backdrop-blur-sm flex items-center justify-center"
+            className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 border border-[#e8dfcf]/40 hover:border-[#c9a96e] bg-black/40 hover:bg-black/60 text-[#f4efe6] hover:text-[#c9a96e] text-[11px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.25em] font-medium transition-all duration-300 backdrop-blur-sm flex items-center justify-center"
           >
             <span>Discover My Creations</span>
           </Link>
@@ -177,9 +177,9 @@ export default function HeroSlideshow() {
       </div>
 
       {/* Slide Navigation Controls & Progress Indicators */}
-      <div className="absolute bottom-10 left-6 md:left-12 right-6 md:right-12 z-20 flex items-end justify-between pointer-events-none">
+      <div className="absolute bottom-6 sm:bottom-10 left-4 sm:left-6 md:left-12 right-4 sm:right-6 md:right-12 z-20 flex items-end justify-between pointer-events-none">
         {/* Active Slide Indicators */}
-        <div className="flex items-center space-x-3 pointer-events-auto">
+        <div className="flex items-center space-x-2 sm:space-x-3 pointer-events-auto">
           {heroSlides.map((slide, idx) => {
             const isActive = idx === currentIndex;
             return (
@@ -189,9 +189,9 @@ export default function HeroSlideshow() {
                 aria-label={`Go to slide ${idx + 1}`}
                 className="group flex flex-col items-start py-2 focus:outline-none"
               >
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1.5 sm:space-x-2">
                   <span
-                    className={`text-[10px] tracking-widest font-mono transition-colors ${
+                    className={`text-[9px] sm:text-[10px] tracking-widest font-mono transition-colors ${
                       isActive ? 'text-[#c9a96e] font-bold' : 'text-white/40 group-hover:text-white/80'
                     }`}
                   >
@@ -199,7 +199,7 @@ export default function HeroSlideshow() {
                   </span>
                   <div
                     className={`h-[2px] transition-all duration-500 rounded-full ${
-                      isActive ? 'w-12 bg-[#c9a96e]' : 'w-4 bg-white/20 group-hover:bg-white/40'
+                      isActive ? 'w-8 sm:w-12 bg-[#c9a96e]' : 'w-3 sm:w-4 bg-white/20 group-hover:bg-white/40'
                     }`}
                   />
                 </div>
@@ -211,14 +211,14 @@ export default function HeroSlideshow() {
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             aria-label={isPlaying ? 'Pause slideshow' : 'Play slideshow'}
-            className="ml-3 p-1.5 rounded-full border border-white/20 text-white/60 hover:text-[#c9a96e] hover:border-[#c9a96e] transition-colors focus:outline-none"
+            className="ml-2 sm:ml-3 p-1.5 rounded-full border border-white/20 text-white/60 hover:text-[#c9a96e] hover:border-[#c9a96e] transition-colors focus:outline-none"
           >
             {isPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
           </button>
         </div>
 
         {/* Current Caption */}
-        <div className="hidden sm:block text-right pointer-events-auto">
+        <div className="hidden md:block text-right pointer-events-auto">
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#c9a96e]/90 font-medium">
             Featured Culinary Art
           </p>
@@ -232,7 +232,7 @@ export default function HeroSlideshow() {
       <a
         href="#about"
         aria-label="Scroll to about section"
-        className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center text-white/40 hover:text-[#c9a96e] transition-colors"
+        className="hidden sm:flex absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex-col items-center text-white/40 hover:text-[#c9a96e] transition-colors"
       >
         <span className="text-[9px] uppercase tracking-[0.3em] mb-1">Scroll</span>
         <ArrowDown className="w-3.5 h-3.5 animate-bounce" />

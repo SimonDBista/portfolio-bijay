@@ -24,6 +24,17 @@ export default function Navbar() {
   const [activeSection, setActiveSection] = useState('home');
 
   useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 60) {
         setScrolled(true);
@@ -62,13 +73,13 @@ export default function Navbar() {
           {/* Brand Logo */}
           <Link
             href="#home"
-            className="group flex flex-col items-start focus:outline-none"
+            className="group flex flex-col items-start focus:outline-none max-w-[75%] sm:max-w-none"
           >
-            <span className="font-serif text-xl sm:text-2xl font-light tracking-[0.2em] text-[#f4efe6] group-hover:text-[#c9a96e] transition-colors uppercase">
+            <span className="font-serif text-lg sm:text-2xl font-light tracking-[0.12em] sm:tracking-[0.2em] text-[#f4efe6] group-hover:text-[#c9a96e] transition-colors uppercase truncate">
               Bijaya Ghimire
             </span>
-            <span className="text-[10px] tracking-[0.35em] text-[#c9a96e] uppercase font-sans font-medium">
-              Chef de Partie & Culinary Specialist
+            <span className="text-[9px] sm:text-[10px] tracking-[0.12em] sm:tracking-[0.35em] text-[#c9a96e] uppercase font-sans font-medium truncate max-w-full">
+              Chef de Partie &bull; Culinary Specialist
             </span>
           </Link>
 
@@ -116,11 +127,11 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu Toggle */}
-          <div className="flex items-center space-x-3 md:hidden">
+          <div className="flex items-center space-x-2 md:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
-              className="p-2 text-[#f4efe6] hover:text-[#c9a96e] transition-colors focus:outline-none"
+              className="p-2 -mr-2 text-[#f4efe6] hover:text-[#c9a96e] transition-colors focus:outline-none"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -130,24 +141,33 @@ export default function Navbar() {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-[#09090b]/98 backdrop-blur-2xl flex flex-col justify-between px-8 py-24 md:hidden animate-fade-in">
-          <div className="flex flex-col space-y-6">
-            <span className="text-xs uppercase tracking-[0.3em] text-[#c9a96e] border-b border-[#c9a96e]/20 pb-2">
-              Navigation
-            </span>
+        <div className="fixed inset-0 z-50 bg-[#09090b]/98 backdrop-blur-2xl flex flex-col justify-between px-6 sm:px-8 py-20 md:hidden animate-fade-in overflow-y-auto">
+          <div className="flex flex-col space-y-5">
+            <div className="flex items-center justify-between border-b border-[#c9a96e]/20 pb-3">
+              <span className="text-xs uppercase tracking-[0.3em] text-[#c9a96e]">
+                Navigation
+              </span>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close menu"
+                className="p-1 text-[#f4efe6] hover:text-[#c9a96e] transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-2xl font-serif tracking-widest text-[#f4efe6] hover:text-[#c9a96e] transition-colors"
+                className="text-xl sm:text-2xl font-serif tracking-widest text-[#f4efe6] hover:text-[#c9a96e] transition-colors py-1"
               >
                 {item.label}
               </Link>
             ))}
           </div>
 
-          <div className="flex flex-col space-y-4 pt-6 border-t border-white/10">
+          <div className="flex flex-col space-y-4 pt-6 border-t border-white/10 mt-8">
             <a
               href="/docs/Bijaya_Ghimire_Executive_Chef_CV.pdf"
               download
@@ -157,11 +177,11 @@ export default function Navbar() {
               <ArrowUpRight className="w-4 h-4" />
             </a>
             <div className="flex items-center justify-between text-xs text-[#8c887e]">
-              <span>ghimirebijay89@gmail.com</span>
+              <span className="truncate pr-2">ghimirebijay89@gmail.com</span>
               <Link
                 href="/admin/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-[#c9a96e] hover:underline"
+                className="text-[#c9a96e] hover:underline shrink-0"
               >
                 Admin Area
               </Link>

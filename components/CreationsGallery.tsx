@@ -57,29 +57,29 @@ export default function CreationsGallery({ initialItems }: CreationsGalleryProps
   }, [activeLightboxIndex, filteredItems.length]);
 
   return (
-    <section id="creations" className="py-28 md:py-36 bg-[#09090b] relative">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <section id="creations" className="py-16 sm:py-24 md:py-36 bg-[#09090b] relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
         {/* Section Header */}
-        <div className="flex flex-col items-center text-center mb-12 md:mb-16">
-          <span className="text-xs uppercase tracking-[0.4em] text-[#c9a96e] mb-3 font-medium">
+        <div className="flex flex-col items-center text-center mb-10 sm:mb-12 md:mb-16">
+          <span className="text-xs uppercase tracking-[0.25em] sm:tracking-[0.4em] text-[#c9a96e] mb-3 font-medium">
             Visual Portfolio
           </span>
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal tracking-wide text-[#f4efe6]">
+          <h2 className="font-serif text-2xl sm:text-4xl md:text-5xl font-normal tracking-wide text-[#f4efe6]">
             Signature Culinary Creations
           </h2>
-          <div className="w-16 h-[1.5px] bg-[#c9a96e] mt-6 mb-6" />
-          <p className="max-w-2xl text-sm sm:text-base text-[#ded8cd]/80 leading-relaxed font-light">
+          <div className="w-16 h-[1.5px] bg-[#c9a96e] mt-4 sm:mt-6 mb-4 sm:mb-6" />
+          <p className="max-w-2xl text-xs sm:text-sm md:text-base text-[#ded8cd]/80 leading-relaxed font-light">
             A visual anthology of culinary art, fine dining presentations, and modern gastronomic craft curated by Chef Bijaya.
           </p>
         </div>
 
         {/* Category Filters */}
-        <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 mb-12 md:mb-16">
+        <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 md:gap-3 mb-10 sm:mb-12 md:mb-16">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-5 py-2 text-xs uppercase tracking-[0.2em] font-medium transition-all ${
+              className={`px-3.5 sm:px-5 py-1.5 sm:py-2 text-[11px] sm:text-xs uppercase tracking-[0.15em] sm:tracking-[0.2em] font-medium transition-all ${
                 selectedCategory === cat
                   ? 'bg-[#c9a96e] text-[#09090b] font-semibold shadow-lg'
                   : 'bg-[#121217] text-[#ded8cd]/70 hover:text-white border border-white/5 hover:border-[#c9a96e]/30'
@@ -162,10 +162,10 @@ export default function CreationsGallery({ initialItems }: CreationsGalleryProps
           {/* Close Button */}
           <button
             onClick={() => setActiveLightboxIndex(null)}
-            className="absolute top-6 right-6 z-50 p-3 rounded-full bg-black/50 border border-white/20 text-white/80 hover:text-[#c9a96e] hover:border-[#c9a96e] transition-colors focus:outline-none"
+            className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 p-2 sm:p-3 rounded-full bg-black/60 border border-white/20 text-white/80 hover:text-[#c9a96e] hover:border-[#c9a96e] transition-colors focus:outline-none"
             aria-label="Close Lightbox"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
 
           {/* Previous Button */}
@@ -176,10 +176,10 @@ export default function CreationsGallery({ initialItems }: CreationsGalleryProps
                 prev !== null ? (prev - 1 + filteredItems.length) % filteredItems.length : 0
               );
             }}
-            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-50 p-3 rounded-full bg-black/50 border border-white/20 text-white/80 hover:text-[#c9a96e] hover:border-[#c9a96e] transition-colors"
+            className="absolute left-2 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-50 p-2 sm:p-3 rounded-full bg-black/60 border border-white/20 text-white/80 hover:text-[#c9a96e] hover:border-[#c9a96e] transition-colors"
             aria-label="Previous photograph"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
 
           {/* Next Button */}
@@ -190,10 +190,10 @@ export default function CreationsGallery({ initialItems }: CreationsGalleryProps
                 prev !== null ? (prev + 1) % filteredItems.length : 0
               );
             }}
-            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-50 p-3 rounded-full bg-black/50 border border-white/20 text-white/80 hover:text-[#c9a96e] hover:border-[#c9a96e] transition-colors"
+            className="absolute right-2 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-50 p-2 sm:p-3 rounded-full bg-black/60 border border-white/20 text-white/80 hover:text-[#c9a96e] hover:border-[#c9a96e] transition-colors"
             aria-label="Next photograph"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
 
           {/* Main Lightbox Image View */}
@@ -201,7 +201,7 @@ export default function CreationsGallery({ initialItems }: CreationsGalleryProps
             className="relative max-w-5xl max-h-[85vh] w-full h-full flex flex-col items-center justify-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative w-full h-[70vh] max-h-[750px]">
+            <div className="relative w-full h-[55vh] sm:h-[70vh] max-h-[750px]">
               <Image
                 src={filteredItems[activeLightboxIndex].url}
                 alt={filteredItems[activeLightboxIndex].title}
@@ -213,11 +213,11 @@ export default function CreationsGallery({ initialItems }: CreationsGalleryProps
             </div>
 
             {/* Lightbox Caption Info */}
-            <div className="mt-4 text-center">
-              <span className="text-xs uppercase tracking-[0.3em] text-[#c9a96e] font-medium block">
+            <div className="mt-3 sm:mt-4 text-center px-4">
+              <span className="text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[#c9a96e] font-medium block">
                 {filteredItems[activeLightboxIndex].category} &bull; Image {activeLightboxIndex + 1} of {filteredItems.length}
               </span>
-              <h4 className="font-serif text-2xl text-[#f4efe6] mt-1 font-normal">
+              <h4 className="font-serif text-lg sm:text-2xl text-[#f4efe6] mt-1 font-normal">
                 {filteredItems[activeLightboxIndex].title}
               </h4>
             </div>

@@ -16,23 +16,23 @@ export default function ExperienceTimeline({ profile = fallbackChefData }: Exper
   const references = profile.references || fallbackChefData.references;
 
   return (
-    <section id="experience" className="py-28 md:py-36 bg-[#09090b] relative">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <section id="experience" className="py-16 sm:py-24 md:py-36 bg-[#09090b] relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
         {/* Section Header */}
-        <div className="flex flex-col items-center text-center mb-16">
-          <span className="text-xs uppercase tracking-[0.4em] text-[#c9a96e] mb-3 font-medium">
+        <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
+          <span className="text-xs uppercase tracking-[0.25em] sm:tracking-[0.4em] text-[#c9a96e] mb-3 font-medium">
             Curated Career Milestones
           </span>
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-normal tracking-wide text-[#f4efe6]">
+          <h2 className="font-serif text-2xl sm:text-4xl md:text-5xl font-normal tracking-wide text-[#f4efe6]">
             Professional Experience &amp; Pedagogy
           </h2>
-          <div className="w-16 h-[1.5px] bg-[#c9a96e] mt-6 mb-8" />
+          <div className="w-16 h-[1.5px] bg-[#c9a96e] mt-4 sm:mt-6 mb-6 sm:mb-8" />
 
           {/* Luxury Tab Switcher */}
-          <div className="inline-flex p-1 bg-[#121217] border border-white/10 rounded-sm">
+          <div className="flex flex-col sm:flex-row w-full sm:w-auto p-1 bg-[#121217] border border-white/10 rounded-sm gap-1 max-w-full">
             <button
               onClick={() => setActiveTab('experience')}
-              className={`px-6 py-2.5 text-xs uppercase tracking-[0.2em] font-medium transition-all ${
+              className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 text-[11px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.2em] font-medium transition-all ${
                 activeTab === 'experience'
                   ? 'bg-[#c9a96e] text-[#09090b] font-semibold shadow-md'
                   : 'text-[#ded8cd]/70 hover:text-white'
@@ -42,7 +42,7 @@ export default function ExperienceTimeline({ profile = fallbackChefData }: Exper
             </button>
             <button
               onClick={() => setActiveTab('education')}
-              className={`px-6 py-2.5 text-xs uppercase tracking-[0.2em] font-medium transition-all ${
+              className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 text-[11px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.2em] font-medium transition-all ${
                 activeTab === 'education'
                   ? 'bg-[#c9a96e] text-[#09090b] font-semibold shadow-md'
                   : 'text-[#ded8cd]/70 hover:text-white'
@@ -52,7 +52,7 @@ export default function ExperienceTimeline({ profile = fallbackChefData }: Exper
             </button>
             <button
               onClick={() => setActiveTab('references')}
-              className={`px-6 py-2.5 text-xs uppercase tracking-[0.2em] font-medium transition-all ${
+              className={`w-full sm:w-auto px-4 sm:px-6 py-2.5 text-[11px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.2em] font-medium transition-all ${
                 activeTab === 'references'
                   ? 'bg-[#c9a96e] text-[#09090b] font-semibold shadow-md'
                   : 'text-[#ded8cd]/70 hover:text-white'
@@ -65,12 +65,12 @@ export default function ExperienceTimeline({ profile = fallbackChefData }: Exper
 
         {/* TAB 1: WORK EXPERIENCE TIMELINE */}
         {activeTab === 'experience' && (
-          <div className="relative border-l border-[#c9a96e]/30 ml-4 md:ml-32 space-y-12 pb-6">
+          <div className="relative border-l border-[#c9a96e]/30 ml-3 sm:ml-6 md:ml-32 space-y-10 sm:space-y-12 pb-6">
             {experiences.map((exp) => (
-              <div key={exp.id} className="relative pl-8 md:pl-12 group">
+              <div key={exp.id} className="relative pl-6 sm:pl-8 md:pl-12 group">
                 {/* Timeline Node Icon */}
-                <div className="absolute -left-[17px] top-1.5 w-8 h-8 rounded-full bg-[#121217] border-2 border-[#c9a96e] flex items-center justify-center text-[#c9a96e] group-hover:scale-110 group-hover:bg-[#c9a96e] group-hover:text-[#09090b] transition-all shadow-lg">
-                  <Briefcase className="w-3.5 h-3.5" />
+                <div className="absolute -left-[15px] sm:-left-[17px] top-1.5 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#121217] border-2 border-[#c9a96e] flex items-center justify-center text-[#c9a96e] group-hover:scale-110 group-hover:bg-[#c9a96e] group-hover:text-[#09090b] transition-all shadow-lg">
+                  <Briefcase className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 </div>
 
                 {/* Period Badge for desktop */}
