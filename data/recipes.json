@@ -1,0 +1,264 @@
+[
+  {
+    "id": "recipe-salmon",
+    "title": "Pan-Seared Atlantic Salmon with Saffron Velouté & Buttered Asparagus",
+    "category": "Fine Dining",
+    "course": "Signature Fish Entrée",
+    "image": "/images/gallery/creation-04.jpg",
+    "prepTime": "15 mins",
+    "cookTime": "20 mins",
+    "servings": "2 Servings",
+    "difficulty": "Executive",
+    "description": "Crisp skin-on salmon fillet seated atop a luscious saffron-infused white wine velouté, flanked by tender buttered asparagus spears, micro-greens, and chive emulsion.",
+    "ingredients": [
+      {
+        "section": "For the Salmon",
+        "items": [
+          "2 fresh Atlantic salmon fillets (180g each, skin-on, scaled & pin-boned)",
+          "1 tbsp Extra virgin olive oil or clarified butter",
+          "Fleur de sel & freshly cracked white pepper",
+          "1 sprig fresh thyme & 1 garlic clove (lightly crushed)"
+        ]
+      },
+      {
+        "section": "For the Saffron Velouté",
+        "items": [
+          "A pinch of premium saffron threads (steeped in 2 tbsp warm fish stock)",
+          "1 finely minced French shallot",
+          "60ml dry white wine (Sauvignon Blanc or Chardonnay)",
+          "120ml concentrated fish or vegetable velouté base",
+          "50ml heavy culinary cream",
+          "30g ice-cold unsalted butter cubes"
+        ]
+      },
+      {
+        "section": "Garnish & Accompaniments",
+        "items": [
+          "8 young asparagus spears (trimmed & blanched in sea-salted water)",
+          "Micro basil & edible borage blossoms",
+          "Cold-pressed herb oil for plating teardrops"
+        ]
+      }
+    ],
+    "instructions": [
+      {
+        "step": 1,
+        "title": "Preparation & Skin Scoring",
+        "details": "Pat the salmon fillets completely dry with linen paper. Using a razor-sharp slicing knife, make 3 shallow diagonal score marks on the skin without puncturing the flesh. Season liberally with fine sea salt."
+      },
+      {
+        "step": 2,
+        "title": "Precision Pan-Searing",
+        "details": "Heat a heavy stainless steel skillet over medium-high until lightly smoking. Add clarified butter. Place salmon skin-side down and gently press with a fish spatula for 30 seconds to prevent curling. Sauté undisturbed for 4 to 5 minutes until the skin is golden and shatteringly crisp."
+      },
+      {
+        "step": 3,
+        "title": "Basting & Gentle Finish",
+        "details": "Flip the fillet, toss in crushed garlic and thyme, and baste the golden crust with bubbling pan juices for 90 seconds. Remove immediately to a warm wire rack to rest."
+      },
+      {
+        "step": 4,
+        "title": "Velouté Emulsification",
+        "details": "In a small saucier, sweat shallots in olive oil without browning. Deglaze with white wine and reduce by two-thirds. Pour in steeped saffron liquor and velouté base. Simmer gently, add cream, and whisk in cold butter cubes off heat until velvety and glossy."
+      }
+    ],
+    "platingNotes": "Spoon a generous circle of radiant golden saffron velouté in the center of a wide-rimmed dark charcoal bowl. Arrange three buttered asparagus spears offset. Gently rest the salmon skin-side up across the spears. Finish with three droplets of herb oil and fresh micro basil.",
+    "chefSecret": "Always allow the skin to dry uncovered in the refrigerator for 30 minutes before cooking. Removing surface moisture guarantees that Michelin-standard glass-crisp skin every single time.",
+    "order": 1
+  },
+  {
+    "id": "recipe-lamb",
+    "title": "Himalayan Herb-Crusted Lamb Rack with Truffled Potato Mousseline",
+    "category": "Meat Special",
+    "course": "Executive Meat Course",
+    "image": "/images/gallery/creation-01.jpg",
+    "prepTime": "25 mins",
+    "cookTime": "30 mins",
+    "servings": "2 Servings",
+    "difficulty": "Master",
+    "description": "French-trimmed prime rack of lamb coated in an aromatic Himalayan timur and rosemary herb crust, served with a velvet truffled potato mousseline and red wine reduction.",
+    "ingredients": [
+      {
+        "section": "For the Lamb Rack",
+        "items": [
+          "1 prime rack of lamb (6 to 8 ribs, fully French-trimmed)",
+          "2 tbsp Dijon mustard for brushing",
+          "35g Japanese panko breadcrumbs",
+          "1 tbsp finely chopped fresh rosemary & thyme",
+          "1 tsp crushed Himalayan timut pepper (wild mountain pepper)",
+          "2 cloves garlic, microplaned",
+          "2 tbsp grated Parmigiano-Reggiano"
+        ]
+      },
+      {
+        "section": "For the Truffled Mousseline",
+        "items": [
+          "400g Yukon gold potatoes (steamed & passed through a fine ricer)",
+          "75g warm cultured butter",
+          "60ml hot heavy cream",
+          "1 tsp white truffle oil & sea salt to taste"
+        ]
+      },
+      {
+        "section": "Cabernet Jus Reduction",
+        "items": [
+          "150ml rich veal or lamb demi-glace",
+          "80ml Cabernet Sauvignon reduction",
+          "1 sprig fresh rosemary & 1 tsp cold butter"
+        ]
+      }
+    ],
+    "instructions": [
+      {
+        "step": 1,
+        "title": "Herb Crust Preparation",
+        "details": "Pulse panko breadcrumbs, fresh rosemary, timut pepper, garlic, and parmesan with a drizzle of olive oil until vibrant green and fragrant."
+      },
+      {
+        "step": 2,
+        "title": "Hard Sear & Crusting",
+        "details": "Season the lamb rack with kosher salt. Sear in a hot skillet for 2 minutes on each side to render the fat cap and develop a deep mahogany caramelized crust. Remove from pan and brush the fat side with a thin layer of Dijon mustard, then press the green herb crust firmly on top."
+      },
+      {
+        "step": 3,
+        "title": "Precision Roasting",
+        "details": "Roast in a preheated oven at 200°C (395°F) for 12 to 14 minutes until the core registers 54°C (130°F) for ideal medium-rare. Rest on a warm board for 8 minutes before carving."
+      },
+      {
+        "step": 4,
+        "title": "Mousseline Whipping",
+        "details": "Vigorously whip the riced potatoes with warm butter, hot cream, and truffle oil until silk-like and aerated."
+      }
+    ],
+    "platingNotes": "Spoon a smooth quenelle of truffled mousseline onto the plate. Carve the lamb rack into double-cut chops and interlock them diagonally over the purée. Drizzle glossy Cabernet reduction around the perimeter and garnish with glazed baby carrots.",
+    "chefSecret": "Resting the lamb is non-negotiable. Allowing the meat to rest for 8 full minutes ensures the juices redistribute evenly throughout the muscle fibers, yielding a succulent pink texture from edge to edge.",
+    "order": 2
+  },
+  {
+    "id": "recipe-risotto",
+    "title": "Wild Forest Chanterelle & Porcini Risotto with Aged Parmigiano",
+    "category": "Continental",
+    "course": "Artisanal Primi / Main",
+    "image": "/images/gallery/creation-06.jpg",
+    "prepTime": "20 mins",
+    "cookTime": "25 mins",
+    "servings": "4 Servings",
+    "difficulty": "Master",
+    "description": "Slow-simmered Carnaroli rice mantecato with cultured butter and 24-month Parmigiano-Reggiano, folded with pan-roasted wild chanterelles and aged balsamic pearls.",
+    "ingredients": [
+      {
+        "section": "Risotto Base",
+        "items": [
+          "320g Acquerello or Carnaroli risotto rice",
+          "1.2L rich vegetable or poultry broth (held at a constant low simmer)",
+          "1 medium shallot, minced to brunoise",
+          "100ml dry Italian white wine (Pinot Grigio)",
+          "50g cold European unsalted butter (cubed)",
+          "60g freshly microplaned 24-month Parmigiano-Reggiano"
+        ]
+      },
+      {
+        "section": "Wild Forest Fungi Sauté",
+        "items": [
+          "200g fresh golden chanterelles (carefully brushed clean)",
+          "15g dried porcini mushrooms (rehydrated in warm broth)",
+          "1 clove garlic & 1 tbsp chopped Italian flat-leaf parsley",
+          "1 tbsp cold-pressed olive oil & knob of butter"
+        ]
+      }
+    ],
+    "instructions": [
+      {
+        "step": 1,
+        "title": "Tostatura (Rice Toasting)",
+        "details": "In a wide copper or cast-iron pan, sweat shallots in olive oil until translucent. Add the dry rice and toast dry for 2 to 3 minutes until grains are translucent around edges and hot to the touch."
+      },
+      {
+        "step": 2,
+        "title": "Deglazing & Gradual Broth Emulsion",
+        "details": "Deglaze with white wine, letting it hiss and evaporate completely. Begin ladling hot stock one ladle at a time, stirring steadily with a wooden spoon in gentle rhythmic circles, adding the next ladle only when the previous one is nearly absorbed."
+      },
+      {
+        "step": 3,
+        "title": "Mushroom Sear",
+        "details": "In a separate smoking skillet, sear wild chanterelles hard with butter and crushed garlic for 3 minutes until caramelized and tender. Season with sea salt and fresh thyme."
+      },
+      {
+        "step": 4,
+        "title": "All'Onda Mantecatura",
+        "details": "At exactly 16 minutes, when rice is al dente, pull pan off the heat. Rest for 1 minute, then vigorously beat in cold butter cubes and grated parmesan to create a luscious wavy emulsion (all'onda)."
+      }
+    ],
+    "platingNotes": "Tap the bottom of shallow warm porcelain bowls to allow the risotto to naturally ripple flat. Top with sautéed wild chanterelles, shaved black truffle or truffle oil, and chervil sprigs.",
+    "chefSecret": "Always incorporate butter and cheese OFF the heat (the mantecatura). Direct burner heat will cause dairy fats to break and separate, turning what should be a creamy velvet emulsion greasy.",
+    "order": 3
+  },
+  {
+    "id": "recipe-momo",
+    "title": "Artisanal Himalayan Momo with Fire-Charred Timur Relish",
+    "category": "Heritage Fusion",
+    "course": "Executive Heritage Specialty",
+    "image": "/images/gallery/creation-05.jpg",
+    "prepTime": "40 mins",
+    "cookTime": "15 mins",
+    "servings": "4 Servings (24 Dumplings)",
+    "difficulty": "Artisan",
+    "description": "Hand-pleated delicate dumplings with a seasoned savory filling, mountain scallions, and ginger, served with a smoky fire-roasted tomato and wild timur pepper chutney.",
+    "ingredients": [
+      {
+        "section": "For the Dough & Wrappers",
+        "items": [
+          "250g unbleached organic all-purpose flour",
+          "130ml lukewarm water",
+          "A pinch of fine sea salt"
+        ]
+      },
+      {
+        "section": "Aromatic Savory Filling",
+        "items": [
+          "400g finely minced meat or minced portobello & cabbage",
+          "1 medium red onion, finely minced",
+          "3 scallions / spring onions, finely sliced",
+          "1.5 tbsp fresh ginger-garlic paste",
+          "1 tsp crushed Himalayan timur (Sichuan pepper)",
+          "1 tsp roasted cumin powder & fresh ground coriander",
+          "2 tbsp melted clarified butter (ghee) for juiciness"
+        ]
+      },
+      {
+        "section": "Smoked Charred Chutney",
+        "items": [
+          "3 ripe vine tomatoes (charred over open flame)",
+          "2 tbsp roasted white sesame seeds",
+          "2 cloves garlic & 1 fresh green chili",
+          "1 tsp roasted timur pepper & fresh lime juice"
+        ]
+      }
+    ],
+    "instructions": [
+      {
+        "step": 1,
+        "title": "Dough Kneading & Resting",
+        "details": "Knead flour and water for 8 minutes until smooth, pliable, and elastic. Cover with a damp muslin cloth and rest for at least 30 minutes."
+      },
+      {
+        "step": 2,
+        "title": "Filling Emulsification",
+        "details": "Mix the minced filling with onion, spring onions, ginger, garlic, ground timur, and spices. Fold in warm melted ghee to ensure the dumplings remain burstingly juicy when steamed."
+      },
+      {
+        "step": 3,
+        "title": "Classical Pleating Technique",
+        "details": "Roll rested dough into a thin cylinder, divide into 20g balls, and roll out each ball into a circular disc with thin edges and a slightly thicker center. Place 1 tablespoon of filling in the center and execute 12 to 14 circular overlapping pleats to seal."
+      },
+      {
+        "step": 4,
+        "title": "Steaming & Chutney Fire-Roasting",
+        "details": "Steam in an oiled bamboo steamer over rolling boiling water for 10 to 12 minutes until wrappers turn glossy and translucent. Meanwhile, blend charred tomatoes with toasted sesame, garlic, and crushed timur into a smoky velvety sauce."
+      }
+    ],
+    "platingNotes": "Present five freshly steamed momos in a circular arrangement on an artisanal slate or dark stone platter. Spoon a pool of vibrant red charred timur relish in the center. Garnish with micro cilantro and a dusting of toasted sesame seeds.",
+    "chefSecret": "Charring whole tomatoes over an open flame until the skins are completely blistered black before blending gives the chutney an unforgettable rustic woodsmoke depth that complements the citrus tingling notes of the timur pepper.",
+    "order": 4
+  }
+]

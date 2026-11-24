@@ -1,114 +1,28 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Award, ShieldCheck, Trophy, GraduationCap, Star, Sparkles, CheckCircle2, ArrowUpRight } from 'lucide-react';
+import { AwardItem } from '@/lib/db';
 
-interface AwardItem {
-  id: string;
-  title: string;
-  category: string;
-  organization: string;
-  year: string;
-  level: string;
-  icon: 'trophy' | 'shield' | 'award' | 'grad' | 'star';
-  description: string;
-  highlights: string[];
+interface AwardsSectionProps {
+  initialAwards?: AwardItem[];
 }
 
-const awardsData: AwardItem[] = [
-  {
-    id: 'award-haccp',
-    title: 'Food Hygiene & Safety Level 3 Certification',
-    category: 'International Certification',
-    organization: 'Training Express (UK Standards)',
-    year: '2022',
-    level: 'Advanced Merit Level',
-    icon: 'shield',
-    description: 'Accredited international qualification covering advanced HACCP principles, food safety management systems, hazard prevention, temperature controls, and sterile cross-contamination defense.',
-    highlights: [
-      'Comprehensive HACCP compliance & inspection readiness',
-      'Advanced temperature critical control point (CCP) governance',
-      'Sanitation protocols for high-capacity banquet kitchens'
-    ]
-  },
-  {
-    id: 'award-kihm',
-    title: 'Professional Cook Certification of Excellence',
-    category: 'Culinary Distinction',
-    organization: 'Kathmandu Institute of Hospitality Management',
-    year: '2018',
-    level: 'Graduated with Distinction',
-    icon: 'trophy',
-    description: 'Comprehensive professional culinary arts training with distinction across classical European knife fundamentals, French mother sauce craft, continental cuisine fabrication, and kitchen operations.',
-    highlights: [
-      'Classic French culinary foundation & mother sauces',
-      'High-velocity commercial line station discipline',
-      'Artisanal butchery, poultry, and seafood fabrication'
-    ]
-  },
-  {
-    id: 'award-kuwait',
-    title: 'Line Station Leadership & Brigade Commendation',
-    category: 'Executive Recognition',
-    organization: 'Swiss Forevermore (Kuwait)',
-    year: '2023 – 2025',
-    level: 'CDP Operational Honor',
-    icon: 'award',
-    description: 'Commended for impeccable line ticket management, station efficiency, recipe standardization, and managing central kitchen requisitioning under high-pressure commercial volume.',
-    highlights: [
-      'Zero-defect ticket dispatch during peak line rush',
-      'Seamless multi-cultural brigade coordination',
-      'Ingredient yield optimization & waste minimization'
-    ]
-  },
-  {
-    id: 'award-instructor',
-    title: 'Culinary Pedagogy & Mentorship Award',
-    category: 'Academic Honor',
-    organization: 'Kumakh College of Management & Technical Science',
-    year: '2021 – 2023',
-    level: 'Distinguished Instructor',
-    icon: 'grad',
-    description: 'Honored for exceptional culinary curriculum engineering and mentoring student cohorts into certified professional kitchen careers across luxury hotel chains worldwide.',
-    highlights: [
-      'Authored hands-on practical culinary syllabi',
-      'Demonstrated modern plating aesthetics & sanitation',
-      'Mentored 100+ hospitality students for international stages'
-    ]
-  },
-  {
-    id: 'award-resort',
-    title: 'Luxury Himalayan Resort Culinary Excellence',
-    category: 'Resort Gastronomy',
-    organization: 'Hotel Mystic Mountain (Nagarkot, Nepal)',
-    year: '2017 – 2020',
-    level: 'Commis to Senior Station Lead',
-    icon: 'star',
-    description: 'Promoted across multiple stations from culinary trainee through Commis II and Commis I for unwavering plate consistency, artisanal salad fabrication, and luxury banquet execution.',
-    highlights: [
-      'Delivered 5-star mountain resort banquet operations',
-      'Mastered artisanal garnishes & intricate buffet centerpieces',
-      'Upheld strict food cost targets under Executive Chef guidelines'
-    ]
-  },
-  {
-    id: 'award-academic',
-    title: 'Higher Secondary Academic Achievement (+2)',
-    category: 'Educational Milestone',
-    organization: 'Shree Swet Baraha Secondary School',
-    year: '2020',
-    level: 'Academic Honor',
-    icon: 'grad',
-    description: 'Higher secondary academic credentials successfully completed in Nepal with verified merit and demonstrated dedication to academic and career excellence.',
-    highlights: [
-      'Formal academic foundation in hospitality sciences',
-      'Demonstrated leadership & school student representation',
-      'Solidified pathway to executive culinary specializations'
-    ]
-  }
-];
+export default function AwardsSection({ initialAwards = [] }: AwardsSectionProps) {
+  const [awards, setAwards] = useState<AwardItem[]>(initialAwards);
 
-export default function AwardsSection() {
+  // Sync with API on mount to catch newly added/edited awards
+  useEffect(() => {
+    fetch('/api/awards')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.awards && data.awards.length > 0) {
+          setAwards(data.awards);
+        }
+      })
+      .catch((err) => console.error('Error fetching awards:', err));
+  }, []);
+
   const renderIcon = (type: AwardItem['icon']) => {
     switch (type) {
       case 'trophy':
@@ -151,7 +65,7 @@ export default function AwardsSection() {
 
         {/* Awards Editorial Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {awardsData.map((award, index) => (
+          {awards.map((award, index) => (
             <div
               key={award.id}
               className="group relative bg-[#111116] border border-white/5 p-6 sm:p-8 flex flex-col justify-between hover:border-[#c9a96e]/40 transition-all duration-500 shadow-xl overflow-hidden hover:-translate-y-1"

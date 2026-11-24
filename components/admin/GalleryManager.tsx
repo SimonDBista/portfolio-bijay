@@ -4,7 +4,7 @@ import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { GalleryItem } from '@/lib/db';
+import { GalleryItem, AwardItem, RecipeItem } from '@/lib/db';
 import { ChefProfile, WorkExperience, EducationCert } from '@/data/chefData';
 import {
   UploadCloud,
@@ -28,22 +28,34 @@ import {
   GraduationCap,
   Save,
   Check,
-  Eye
+  Eye,
+  Trophy,
+  ChefHat,
+  ShieldCheck,
+  Award
 } from 'lucide-react';
 
 interface GalleryManagerProps {
   user: { username: string; role: string };
   initialItems: GalleryItem[];
   initialProfile: ChefProfile;
+  initialAwards?: AwardItem[];
+  initialRecipes?: RecipeItem[];
 }
 
-export default function GalleryManager({ user, initialItems, initialProfile }: GalleryManagerProps) {
+export default function GalleryManager({
+  user,
+  initialItems,
+  initialProfile,
+  initialAwards = [],
+  initialRecipes = []
+}: GalleryManagerProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const replaceFileInputRef = useRef<HTMLInputElement>(null);
 
   // Active Admin Tab
-  const [activeTab, setActiveTab] = useState<'gallery' | 'about' | 'experience' | 'education'>('gallery');
+  const [activeTab, setActiveTab] = useState<'gallery' | 'awards' | 'recipes' | 'about' | 'experience' | 'education'>('gallery');
 
   // Status & Feedback
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -65,6 +77,43 @@ export default function GalleryManager({ user, initialItems, initialProfile }: G
   const [editFeatured, setEditFeatured] = useState(false);
   const [replacingItemId, setReplacingItemId] = useState<string | null>(null);
   const [replacingLoading, setReplacingLoading] = useState(false);
+
+  // ---------------- TAB 2: AWARDS & ACHIEVEMENTS STATE ---------------- //
+  const [awards, setAwards] = useState<AwardItem[]>(initialAwards);
+  const [editingAward, setEditingAward] = useState<AwardItem | null>(null);
+  const [isAddingAward, setIsAddingAward] = useState(false);
+  const [awardForm, setAwardForm] = useState({
+    title: '',
+    category: '',
+    organization: '',
+    year: '',
+    level: '',
+    icon: 'trophy' as AwardItem['icon'],
+    description: '',
+    highlights: ''
+  });
+  const [awardLoading, setAwardLoading] = useState(false);
+
+  // ---------------- TAB 3: MASTER RECIPES STATE ---------------- //
+  const [recipes, setRecipes] = useState<RecipeItem[]>(initialRecipes);
+  const [editingRecipe, setEditingRecipe] = useState<RecipeItem | null>(null);
+  const [isAddingRecipe, setIsAddingRecipe] = useState(false);
+  const [recipeForm, setRecipeForm] = useState({
+    title: '',
+    category: 'Fine Dining' as RecipeItem['category'],
+    course: '',
+    image: '',
+    prepTime: '',
+    cookTime: '',
+    servings: '',
+    difficulty: 'Executive' as RecipeItem['difficulty'],
+    description: '',
+    ingredientsText: '',
+    instructionsText: '',
+    platingNotes: '',
+    chefSecret: ''
+  });
+  const [recipeLoading, setRecipeLoading] = useState(false);
 
   // ---------------- TAB 2: ABOUT SECTION STATE ---------------- //
   const [profile, setProfile] = useState<ChefProfile>(initialProfile);
@@ -539,6 +588,261 @@ export default function GalleryManager({ user, initialItems, initialProfile }: G
     }
   };
 
+  // ---------------- TAB 5: AWARDS & ACHIEVEMENTS HANDLERS ---------------- //
+  const openAddAward = () => {
+    setEditingAward(null);
+    setAwardForm({
+      title: '',
+      category: 'International Certification',
+      organization: '',
+      year: new Date().getFullYear().toString(),
+      level: 'Advanced Merit Level',
+      icon: 'trophy',
+      description: '',
+      highlights: '',
+    });
+    setIsAddingAward(true);
+  };
+
+  const openEditAward = (award: AwardItem) => {
+    setEditingAward(award);
+    setAwardForm({
+      title: award.title,
+      category: award.category,
+      organization: award.organization,
+      year: award.year,
+      level: award.level,
+      icon: award.icon,
+      description: award.description,
+      highlights: (award.highlights || []).join('\n'),
+    });
+    setIsAddingAward(true);
+  };
+
+  const handleSaveAward = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAwardLoading(true);
+    setStatusMessage(null);
+
+    const highlightsArray = awardForm.highlights
+      .split('\n')
+      .map((h) => h.trim())
+      .filter(Boolean);
+
+    try {
+      const payload = {
+        title: awardForm.title,
+        category: awardForm.category,
+        organization: awardForm.organization,
+        year: awardForm.year,
+        level: awardForm.level,
+        icon: awardForm.icon,
+        description: awardForm.description,
+        highlights: highlightsArray,
+      };
+
+      if (editingAward) {
+        const res = await fetch(`/api/awards/${editingAward.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to update award');
+
+        setAwards((prev) =>
+          prev.map((a) => (a.id === editingAward.id ? { ...a, ...data.award } : a))
+        );
+        setStatusMessage({ type: 'success', text: `Award "${awardForm.title}" updated successfully!` });
+      } else {
+        const res = await fetch('/api/awards', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to add award');
+
+        setAwards(data.awards);
+        setStatusMessage({ type: 'success', text: `Award "${awardForm.title}" added successfully!` });
+      }
+      setIsAddingAward(false);
+      setEditingAward(null);
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: err.message || 'Error saving award.' });
+    } finally {
+      setAwardLoading(false);
+    }
+  };
+
+  const handleDeleteAward = async (id: string, title: string) => {
+    if (!window.confirm(`Delete award "${title}"?`)) return;
+
+    try {
+      const res = await fetch(`/api/awards/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete');
+
+      setAwards(data.awards);
+      setStatusMessage({ type: 'success', text: `Award "${title}" deleted.` });
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: err.message || 'Failed to delete.' });
+    }
+  };
+
+  // ---------------- TAB 6: MASTER RECIPES HANDLERS ---------------- //
+  const openAddRecipe = () => {
+    setEditingRecipe(null);
+    setRecipeForm({
+      title: '',
+      category: 'Fine Dining',
+      course: 'Signature Entrée',
+      image: '/images/gallery/creation-04.jpg',
+      prepTime: '20 mins',
+      cookTime: '25 mins',
+      servings: '2 Servings',
+      difficulty: 'Executive',
+      description: '',
+      ingredientsText: '',
+      instructionsText: '',
+      platingNotes: '',
+      chefSecret: '',
+    });
+    setIsAddingRecipe(true);
+  };
+
+  const openEditRecipe = (recipe: RecipeItem) => {
+    setEditingRecipe(recipe);
+    const ingText = recipe.ingredients
+      ? recipe.ingredients.map(ing => `[${ing.section}]\n` + ing.items.join('\n')).join('\n\n')
+      : '';
+    const instText = recipe.instructions
+      ? recipe.instructions.map(inst => `${inst.title} - ${inst.details}`).join('\n')
+      : '';
+
+    setRecipeForm({
+      title: recipe.title,
+      category: recipe.category,
+      course: recipe.course,
+      image: recipe.image,
+      prepTime: recipe.prepTime,
+      cookTime: recipe.cookTime,
+      servings: recipe.servings,
+      difficulty: recipe.difficulty,
+      description: recipe.description,
+      ingredientsText: ingText,
+      instructionsText: instText,
+      platingNotes: recipe.platingNotes,
+      chefSecret: recipe.chefSecret,
+    });
+    setIsAddingRecipe(true);
+  };
+
+  const handleSaveRecipe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRecipeLoading(true);
+    setStatusMessage(null);
+
+    const parsedIngredients: { section: string; items: string[] }[] = [];
+    const ingSections = recipeForm.ingredientsText.split('\n\n');
+    for (const sec of ingSections) {
+      const lines = sec.split('\n').map(l => l.trim()).filter(Boolean);
+      if (lines.length === 0) continue;
+      let sectionName = 'Ingredients';
+      let items = lines;
+      if (lines[0].startsWith('[') && lines[0].endsWith(']')) {
+        sectionName = lines[0].substring(1, lines[0].length - 1);
+        items = lines.slice(1);
+      }
+      if (items.length > 0) {
+        parsedIngredients.push({ section: sectionName, items });
+      }
+    }
+    if (parsedIngredients.length === 0 && recipeForm.ingredientsText.trim()) {
+      parsedIngredients.push({
+        section: 'Main Ingredients',
+        items: recipeForm.ingredientsText.split('\n').map(l => l.trim()).filter(Boolean)
+      });
+    }
+
+    const parsedInstructions = recipeForm.instructionsText
+      .split('\n')
+      .map(l => l.trim())
+      .filter(Boolean)
+      .map((line, idx) => {
+        const parts = line.split(' - ');
+        if (parts.length >= 2) {
+          return { step: idx + 1, title: parts[0].trim(), details: parts.slice(1).join(' - ').trim() };
+        }
+        return { step: idx + 1, title: `Step ${idx + 1}`, details: line };
+      });
+
+    try {
+      const payload = {
+        title: recipeForm.title,
+        category: recipeForm.category,
+        course: recipeForm.course,
+        image: recipeForm.image,
+        prepTime: recipeForm.prepTime,
+        cookTime: recipeForm.cookTime,
+        servings: recipeForm.servings,
+        difficulty: recipeForm.difficulty,
+        description: recipeForm.description,
+        ingredients: parsedIngredients,
+        instructions: parsedInstructions,
+        platingNotes: recipeForm.platingNotes,
+        chefSecret: recipeForm.chefSecret,
+      };
+
+      if (editingRecipe) {
+        const res = await fetch(`/api/recipes/${editingRecipe.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to update recipe');
+
+        setRecipes((prev) =>
+          prev.map((r) => (r.id === editingRecipe.id ? { ...r, ...data.recipe } : r))
+        );
+        setStatusMessage({ type: 'success', text: `Recipe "${recipeForm.title}" updated successfully!` });
+      } else {
+        const res = await fetch('/api/recipes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to add recipe');
+
+        setRecipes(data.recipes);
+        setStatusMessage({ type: 'success', text: `Recipe "${recipeForm.title}" added successfully!` });
+      }
+      setIsAddingRecipe(false);
+      setEditingRecipe(null);
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: err.message || 'Error saving recipe.' });
+    } finally {
+      setRecipeLoading(false);
+    }
+  };
+
+  const handleDeleteRecipe = async (id: string, title: string) => {
+    if (!window.confirm(`Delete recipe "${title}"?`)) return;
+
+    try {
+      const res = await fetch(`/api/recipes/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete');
+
+      setRecipes(data.recipes);
+      setStatusMessage({ type: 'success', text: `Recipe "${title}" deleted.` });
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: err.message || 'Failed to delete.' });
+    }
+  };
+
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
     router.push('/admin/login');
@@ -604,7 +908,31 @@ export default function GalleryManager({ user, initialItems, initialProfile }: G
           }`}
         >
           <ImageIcon className="w-4 h-4" />
-          <span>Gallery &amp; Photos ({items.length})</span>
+          <span>Photo Gallery ({items.length})</span>
+        </button>
+
+        <button
+          onClick={() => { setActiveTab('awards'); setStatusMessage(null); }}
+          className={`flex items-center space-x-2 px-5 py-2.5 text-xs uppercase tracking-wider font-medium transition-all ${
+            activeTab === 'awards'
+              ? 'bg-[#c9a96e] text-[#09090b] font-semibold shadow-md'
+              : 'bg-[#121217] text-[#ded8cd]/70 hover:text-white border border-white/5'
+          }`}
+        >
+          <Trophy className="w-4 h-4" />
+          <span>Awards &amp; Honors ({awards.length})</span>
+        </button>
+
+        <button
+          onClick={() => { setActiveTab('recipes'); setStatusMessage(null); }}
+          className={`flex items-center space-x-2 px-5 py-2.5 text-xs uppercase tracking-wider font-medium transition-all ${
+            activeTab === 'recipes'
+              ? 'bg-[#c9a96e] text-[#09090b] font-semibold shadow-md'
+              : 'bg-[#121217] text-[#ded8cd]/70 hover:text-white border border-white/5'
+          }`}
+        >
+          <ChefHat className="w-4 h-4" />
+          <span>Master Recipes ({recipes.length})</span>
         </button>
 
         <button
@@ -616,7 +944,7 @@ export default function GalleryManager({ user, initialItems, initialProfile }: G
           }`}
         >
           <BookOpen className="w-4 h-4" />
-          <span>About &amp; Biography Content</span>
+          <span>About Biography</span>
         </button>
 
         <button
@@ -628,7 +956,7 @@ export default function GalleryManager({ user, initialItems, initialProfile }: G
           }`}
         >
           <Briefcase className="w-4 h-4" />
-          <span>Career Experiences ({experiences.length})</span>
+          <span>Career ({experiences.length})</span>
         </button>
 
         <button
@@ -640,7 +968,7 @@ export default function GalleryManager({ user, initialItems, initialProfile }: G
           }`}
         >
           <GraduationCap className="w-4 h-4" />
-          <span>Education &amp; Certificates ({education.length})</span>
+          <span>Education ({education.length})</span>
         </button>
       </div>
 
@@ -1597,6 +1925,566 @@ export default function GalleryManager({ user, initialItems, initialProfile }: G
                     >
                       {eduLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                       <span>{editingEdu ? 'Update Certificate' : 'Save Certificate'}</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* ======================================================== */}
+      {/* ---------------- TAB 5: AWARDS & ACHIEVEMENTS ---------- */}
+      {/* ======================================================== */}
+      {activeTab === 'awards' && (
+        <section className="space-y-8 animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+            <div>
+              <h2 className="font-serif text-2xl text-[#f4efe6]">
+                Awards, Accreditations &amp; Honors
+              </h2>
+              <p className="text-xs text-[#8c887e] mt-1">
+                Manage verified qualifications, culinary certifications, and brigade leadership honors displayed on the homepage.
+              </p>
+            </div>
+            <button
+              onClick={openAddAward}
+              className="inline-flex items-center space-x-2 px-5 py-2.5 bg-[#c9a96e] hover:bg-[#dfc28d] text-[#09090b] text-xs uppercase tracking-wider font-semibold transition-all shadow-md self-start sm:self-auto"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add New Award</span>
+            </button>
+          </div>
+
+          {/* Awards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {awards.map((award) => (
+              <div
+                key={award.id}
+                className="bg-[#121217] border border-white/5 p-6 flex flex-col justify-between hover:border-[#c9a96e]/30 transition-all shadow-lg relative group"
+              >
+                <div>
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-10 h-10 rounded-sm bg-[#181820] border border-[#c9a96e]/30 flex items-center justify-center text-[#c9a96e]">
+                      {award.icon === 'trophy' ? (
+                        <Trophy className="w-5 h-5" />
+                      ) : award.icon === 'shield' ? (
+                        <ShieldCheck className="w-5 h-5" />
+                      ) : award.icon === 'grad' ? (
+                        <GraduationCap className="w-5 h-5" />
+                      ) : award.icon === 'star' ? (
+                        <Star className="w-5 h-5" />
+                      ) : (
+                        <Award className="w-5 h-5" />
+                      )}
+                    </div>
+                    <span className="text-[11px] font-mono uppercase tracking-widest text-[#c9a96e] px-2 py-0.5 bg-[#c9a96e]/10 border border-[#c9a96e]/20">
+                      {award.year}
+                    </span>
+                  </div>
+
+                  <span className="text-[10px] uppercase tracking-wider text-[#c9a96e]/80 font-medium block mb-1">
+                    {award.category} &bull; {award.level}
+                  </span>
+                  <h3 className="font-serif text-lg text-[#f4efe6] font-normal leading-snug mb-1">
+                    {award.title}
+                  </h3>
+                  <p className="text-xs text-[#8c887e] uppercase font-mono mb-3">
+                    {award.organization}
+                  </p>
+                  <p className="text-xs text-[#ded8cd]/80 leading-relaxed font-light mb-4 line-clamp-3">
+                    {award.description}
+                  </p>
+
+                  {award.highlights && award.highlights.length > 0 && (
+                    <div className="space-y-1 mb-4 pt-3 border-t border-white/5">
+                      {award.highlights.slice(0, 3).map((h, i) => (
+                        <div key={i} className="text-[11px] text-[#ded8cd]/70 flex items-start space-x-1.5">
+                          <Check className="w-3 h-3 text-[#c9a96e] shrink-0 mt-0.5" />
+                          <span className="line-clamp-1">{h}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-end space-x-2 pt-4 border-t border-white/5">
+                  <button
+                    onClick={() => openEditAward(award)}
+                    className="p-1.5 text-[#ded8cd]/60 hover:text-[#c9a96e] transition-colors"
+                    title="Edit Award"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteAward(award.id, award.title)}
+                    className="p-1.5 text-[#ded8cd]/60 hover:text-red-400 transition-colors"
+                    title="Delete Award"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* ADD / EDIT AWARD MODAL */}
+          {isAddingAward && (
+            <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+              <div className="bg-[#121217] border border-[#c9a96e]/40 p-6 md:p-8 max-w-xl w-full shadow-2xl space-y-5 my-8">
+                <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                  <h3 className="font-serif text-xl text-[#f4efe6]">
+                    {editingAward ? 'Edit Award / Accreditation' : 'Add New Award / Accreditation'}
+                  </h3>
+                  <button onClick={() => setIsAddingAward(false)} className="p-1 text-white/60 hover:text-white">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleSaveAward} className="space-y-4">
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                      Award / Certification Title *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={awardForm.title}
+                      onChange={(e) => setAwardForm({ ...awardForm, title: e.target.value })}
+                      placeholder="e.g. Food Hygiene & Safety Level 3 Certification"
+                      className="w-full bg-[#181820] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                        Issuing Organization *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={awardForm.organization}
+                        onChange={(e) => setAwardForm({ ...awardForm, organization: e.target.value })}
+                        placeholder="e.g. Training Express (UK Standards)"
+                        className="w-full bg-[#181820] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                        Year / Period *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={awardForm.year}
+                        onChange={(e) => setAwardForm({ ...awardForm, year: e.target.value })}
+                        placeholder="e.g. 2022 or 2023 – 2025"
+                        className="w-full bg-[#181820] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                        Category
+                      </label>
+                      <input
+                        type="text"
+                        value={awardForm.category}
+                        onChange={(e) => setAwardForm({ ...awardForm, category: e.target.value })}
+                        placeholder="e.g. International Certification"
+                        className="w-full bg-[#181820] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                        Distinction / Level
+                      </label>
+                      <input
+                        type="text"
+                        value={awardForm.level}
+                        onChange={(e) => setAwardForm({ ...awardForm, level: e.target.value })}
+                        placeholder="e.g. Advanced Merit Level"
+                        className="w-full bg-[#181820] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                        Badge Icon
+                      </label>
+                      <select
+                        value={awardForm.icon}
+                        onChange={(e) => setAwardForm({ ...awardForm, icon: e.target.value as AwardItem['icon'] })}
+                        className="w-full bg-[#181820] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                      >
+                        <option value="trophy">Trophy</option>
+                        <option value="shield">Shield Check</option>
+                        <option value="award">Award Medal</option>
+                        <option value="grad">Graduation Cap</option>
+                        <option value="star">Star</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                      Narrative Description
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={awardForm.description}
+                      onChange={(e) => setAwardForm({ ...awardForm, description: e.target.value })}
+                      placeholder="Comprehensive accreditation context, competencies demonstrated..."
+                      className="w-full bg-[#181820] border border-white/10 p-3 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                      Key Highlights (One per line)
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={awardForm.highlights}
+                      onChange={(e) => setAwardForm({ ...awardForm, highlights: e.target.value })}
+                      placeholder="Comprehensive HACCP compliance&#10;Advanced temperature control point governance&#10;Sanitation protocols for high-capacity banquet kitchens"
+                      className="w-full bg-[#181820] border border-white/10 p-3 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-end space-x-3 pt-4 border-t border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingAward(false)}
+                      className="px-4 py-2 text-xs uppercase tracking-wider text-[#ded8cd] hover:text-white"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={awardLoading}
+                      className="px-6 py-2 bg-[#c9a96e] hover:bg-[#dfc28d] text-[#09090b] text-xs uppercase tracking-wider font-semibold flex items-center space-x-1"
+                    >
+                      {awardLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                      <span>{editingAward ? 'Update Award' : 'Save Award'}</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* ======================================================== */}
+      {/* ---------------- TAB 6: MASTER RECIPES ----------------- */}
+      {/* ======================================================== */}
+      {activeTab === 'recipes' && (
+        <section className="space-y-8 animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+            <div>
+              <h2 className="font-serif text-2xl text-[#f4efe6]">
+                Master Recipes &amp; Culinary Archives
+              </h2>
+              <p className="text-xs text-[#8c887e] mt-1">
+                Manage signature master dishes, method instructions, ingredient formulas, and plating notes displayed in the recipes section.
+              </p>
+            </div>
+            <button
+              onClick={openAddRecipe}
+              className="inline-flex items-center space-x-2 px-5 py-2.5 bg-[#c9a96e] hover:bg-[#dfc28d] text-[#09090b] text-xs uppercase tracking-wider font-semibold transition-all shadow-md self-start sm:self-auto"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add New Recipe</span>
+            </button>
+          </div>
+
+          {/* Recipes Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {recipes.map((recipe) => (
+              <div
+                key={recipe.id}
+                className="bg-[#121217] border border-white/5 p-5 flex flex-col justify-between hover:border-[#c9a96e]/30 transition-all shadow-lg"
+              >
+                <div className="flex flex-col sm:flex-row gap-4 mb-4">
+                  <div className="relative w-full sm:w-28 h-32 sm:h-28 bg-[#181820] shrink-0 overflow-hidden">
+                    <Image
+                      src={recipe.image || '/images/gallery/creation-04.jpg'}
+                      alt={recipe.title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2 mb-1">
+                      <span className="text-[10px] uppercase font-mono tracking-widest text-[#c9a96e] px-2 py-0.5 bg-[#c9a96e]/10 border border-[#c9a96e]/20">
+                        {recipe.category}
+                      </span>
+                      <span className="text-[10px] uppercase font-mono tracking-widest text-white/50">
+                        {recipe.difficulty}
+                      </span>
+                    </div>
+
+                    <h3 className="font-serif text-base text-[#f4efe6] font-normal leading-snug line-clamp-2">
+                      {recipe.title}
+                    </h3>
+
+                    <p className="text-xs text-[#8c887e] font-mono mt-0.5 mb-2">
+                      {recipe.course}
+                    </p>
+
+                    <div className="flex items-center space-x-3 text-[11px] text-[#ded8cd]/70">
+                      <span>Prep: {recipe.prepTime}</span>
+                      <span>&bull;</span>
+                      <span>Cook: {recipe.cookTime}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-3 border-t border-white/5 text-xs">
+                  <span className="text-[#8c887e] font-mono">
+                    {recipe.ingredients ? recipe.ingredients.reduce((acc, curr) => acc + curr.items.length, 0) : 0} Ingredients &bull; {recipe.instructions?.length || 0} Steps
+                  </span>
+
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => openEditRecipe(recipe)}
+                      className="p-1.5 text-[#ded8cd]/60 hover:text-[#c9a96e] transition-colors"
+                      title="Edit Recipe"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteRecipe(recipe.id, recipe.title)}
+                      className="p-1.5 text-[#ded8cd]/60 hover:text-red-400 transition-colors"
+                      title="Delete Recipe"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* ADD / EDIT RECIPE MODAL */}
+          {isAddingRecipe && (
+            <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+              <div className="bg-[#121217] border border-[#c9a96e]/40 p-6 md:p-8 max-w-2xl w-full shadow-2xl space-y-5 my-8">
+                <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                  <h3 className="font-serif text-xl text-[#f4efe6]">
+                    {editingRecipe ? 'Edit Master Recipe' : 'Add New Master Recipe'}
+                  </h3>
+                  <button onClick={() => setIsAddingRecipe(false)} className="p-1 text-white/60 hover:text-white">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleSaveRecipe} className="space-y-4">
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                      Recipe Title *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={recipeForm.title}
+                      onChange={(e) => setRecipeForm({ ...recipeForm, title: e.target.value })}
+                      placeholder="e.g. Pan-Seared Atlantic Salmon with Saffron Velouté"
+                      className="w-full bg-[#181820] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                        Category
+                      </label>
+                      <select
+                        value={recipeForm.category}
+                        onChange={(e) => setRecipeForm({ ...recipeForm, category: e.target.value as RecipeItem['category'] })}
+                        className="w-full bg-[#181820] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                      >
+                        <option value="Fine Dining">Fine Dining</option>
+                        <option value="Meat Special">Meat Special</option>
+                        <option value="Continental">Continental</option>
+                        <option value="Heritage Fusion">Heritage Fusion</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                        Course Designation
+                      </label>
+                      <input
+                        type="text"
+                        value={recipeForm.course}
+                        onChange={(e) => setRecipeForm({ ...recipeForm, course: e.target.value })}
+                        placeholder="e.g. Signature Fish Entrée"
+                        className="w-full bg-[#181820] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                        Difficulty
+                      </label>
+                      <select
+                        value={recipeForm.difficulty}
+                        onChange={(e) => setRecipeForm({ ...recipeForm, difficulty: e.target.value as RecipeItem['difficulty'] })}
+                        className="w-full bg-[#181820] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                      >
+                        <option value="Executive">Executive</option>
+                        <option value="Master">Master</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Artisan">Artisan</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                        Image URL
+                      </label>
+                      <input
+                        type="text"
+                        value={recipeForm.image}
+                        onChange={(e) => setRecipeForm({ ...recipeForm, image: e.target.value })}
+                        placeholder="/images/gallery/creation-04.jpg"
+                        className="w-full bg-[#181820] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                        Prep Time
+                      </label>
+                      <input
+                        type="text"
+                        value={recipeForm.prepTime}
+                        onChange={(e) => setRecipeForm({ ...recipeForm, prepTime: e.target.value })}
+                        placeholder="15 mins"
+                        className="w-full bg-[#181820] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                        Cook Time
+                      </label>
+                      <input
+                        type="text"
+                        value={recipeForm.cookTime}
+                        onChange={(e) => setRecipeForm({ ...recipeForm, cookTime: e.target.value })}
+                        placeholder="20 mins"
+                        className="w-full bg-[#181820] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                        Servings
+                      </label>
+                      <input
+                        type="text"
+                        value={recipeForm.servings}
+                        onChange={(e) => setRecipeForm({ ...recipeForm, servings: e.target.value })}
+                        placeholder="2 Servings"
+                        className="w-full bg-[#181820] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                      Recipe Overview / Description
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={recipeForm.description}
+                      onChange={(e) => setRecipeForm({ ...recipeForm, description: e.target.value })}
+                      placeholder="Crisp skin-on salmon fillet seated atop a luscious saffron-infused white wine velouté..."
+                      className="w-full bg-[#181820] border border-white/10 p-3 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                      Ingredients (Group sections with [Section Title])
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={recipeForm.ingredientsText}
+                      onChange={(e) => setRecipeForm({ ...recipeForm, ingredientsText: e.target.value })}
+                      placeholder="[For the Salmon]&#10;2 fresh Atlantic salmon fillets&#10;1 tbsp olive oil&#10;&#10;[For the Velouté]&#10;Pinch of saffron&#10;60ml white wine"
+                      className="w-full bg-[#181820] border border-white/10 p-3 text-xs text-white focus:outline-none focus:border-[#c9a96e] font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                      Instructions (Format: Title - Method Details per line)
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={recipeForm.instructionsText}
+                      onChange={(e) => setRecipeForm({ ...recipeForm, instructionsText: e.target.value })}
+                      placeholder="Skin Scoring - Pat salmon dry and make 3 diagonal score marks.&#10;Pan Searing - Sauté skin-side down for 4 minutes until crisp.&#10;Basting - Flip and baste with thyme butter."
+                      className="w-full bg-[#181820] border border-white/10 p-3 text-xs text-white focus:outline-none focus:border-[#c9a96e] font-mono"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                        Plating Notes
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={recipeForm.platingNotes}
+                        onChange={(e) => setRecipeForm({ ...recipeForm, platingNotes: e.target.value })}
+                        placeholder="Spoon golden velouté in center of warm shallow bowl..."
+                        className="w-full bg-[#181820] border border-white/10 p-3 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1">
+                        Chef&apos;s Secret Technique
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={recipeForm.chefSecret}
+                        onChange={(e) => setRecipeForm({ ...recipeForm, chefSecret: e.target.value })}
+                        placeholder="Dry skin uncovered in fridge for 30 minutes before searing..."
+                        className="w-full bg-[#181820] border border-white/10 p-3 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end space-x-3 pt-4 border-t border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingRecipe(false)}
+                      className="px-4 py-2 text-xs uppercase tracking-wider text-[#ded8cd] hover:text-white"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={recipeLoading}
+                      className="px-6 py-2 bg-[#c9a96e] hover:bg-[#dfc28d] text-[#09090b] text-xs uppercase tracking-wider font-semibold flex items-center space-x-1"
+                    >
+                      {recipeLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                      <span>{editingRecipe ? 'Update Recipe' : 'Save Recipe'}</span>
                     </button>
                   </div>
                 </form>

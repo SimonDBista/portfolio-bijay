@@ -19,6 +19,46 @@ export interface GalleryItem {
 
 const DATA_FILE = path.join(process.cwd(), 'data', 'gallery.json');
 const PROFILE_FILE = path.join(process.cwd(), 'data', 'chefProfile.json');
+const AWARDS_FILE = path.join(process.cwd(), 'data', 'awards.json');
+const RECIPES_FILE = path.join(process.cwd(), 'data', 'recipes.json');
+
+export interface AwardItem {
+  id: string;
+  title: string;
+  category: string;
+  organization: string;
+  year: string;
+  level: string;
+  icon: 'trophy' | 'shield' | 'award' | 'grad' | 'star';
+  description: string;
+  highlights: string[];
+  order?: number;
+}
+
+export interface RecipeItem {
+  id: string;
+  title: string;
+  category: 'Fine Dining' | 'Meat Special' | 'Continental' | 'Heritage Fusion';
+  course: string;
+  image: string;
+  prepTime: string;
+  cookTime: string;
+  servings: string;
+  difficulty: 'Executive' | 'Master' | 'Intermediate' | 'Artisan';
+  description: string;
+  ingredients: {
+    section: string;
+    items: string[];
+  }[];
+  instructions: {
+    step: number;
+    title: string;
+    details: string;
+  }[];
+  platingNotes: string;
+  chefSecret: string;
+  order?: number;
+}
 
 function ensureDataFile(): void {
   const dir = path.dirname(DATA_FILE);
@@ -27,6 +67,26 @@ function ensureDataFile(): void {
   }
   if (!fs.existsSync(DATA_FILE)) {
     fs.writeFileSync(DATA_FILE, '[]', 'utf-8');
+  }
+}
+
+function ensureAwardsFile(): void {
+  const dir = path.dirname(AWARDS_FILE);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  if (!fs.existsSync(AWARDS_FILE)) {
+    fs.writeFileSync(AWARDS_FILE, '[]', 'utf-8');
+  }
+}
+
+function ensureRecipesFile(): void {
+  const dir = path.dirname(RECIPES_FILE);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  if (!fs.existsSync(RECIPES_FILE)) {
+    fs.writeFileSync(RECIPES_FILE, '[]', 'utf-8');
   }
 }
 
@@ -287,4 +347,110 @@ export function deleteEducation(id: string): EducationCert[] {
   profile.education = profile.education.filter(e => e.id !== id);
   saveChefProfile(profile);
   return profile.education;
+}
+
+// ---------------- AWARDS & ACHIEVEMENTS OPERATIONS ---------------- //
+
+export function getAwards(): AwardItem[] {
+  ensureAwardsFile();
+  try {
+    const raw = fs.readFileSync(AWARDS_FILE, 'utf-8');
+    const items: AwardItem[] = JSON.parse(raw);
+    return items.sort((a, b) => (a.order || 0) - (b.order || 0));
+  } catch (error) {
+    console.error('Error reading awards:', error);
+    return [];
+  }
+}
+
+export function saveAwards(items: AwardItem[]): boolean {
+  ensureAwardsFile();
+  try {
+    const tempFile = `${AWARDS_FILE}.tmp`;
+    fs.writeFileSync(tempFile, JSON.stringify(items, null, 2), 'utf-8');
+    fs.renameSync(tempFile, AWARDS_FILE);
+    return true;
+  } catch (error) {
+    console.error('Error saving awards:', error);
+    return false;
+  }
+}
+
+export function addAward(award: Omit<AwardItem, 'id'> & { id?: string }): AwardItem[] {
+  const current = getAwards();
+  const id = award.id || `award-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+  const order = award.order !== undefined ? award.order : current.length + 1;
+  const newAward: AwardItem = { ...award, id, order };
+  const updated = [newAward, ...current].map((it, idx) => ({ ...it, order: idx + 1 }));
+  saveAwards(updated);
+  return updated;
+}
+
+export function updateAward(id: string, updates: Partial<AwardItem>): AwardItem | null {
+  const current = getAwards();
+  const index = current.findIndex(a => a.id === id);
+  if (index === -1) return null;
+  current[index] = { ...current[index], ...updates };
+  saveAwards(current);
+  return current[index];
+}
+
+export function deleteAward(id: string): AwardItem[] {
+  const current = getAwards();
+  const filtered = current.filter(a => a.id !== id);
+  saveAwards(filtered);
+  return filtered;
+}
+
+// ---------------- MASTER RECIPES OPERATIONS ---------------- //
+
+export function getRecipes(): RecipeItem[] {
+  ensureRecipesFile();
+  try {
+    const raw = fs.readFileSync(RECIPES_FILE, 'utf-8');
+    const items: RecipeItem[] = JSON.parse(raw);
+    return items.sort((a, b) => (a.order || 0) - (b.order || 0));
+  } catch (error) {
+    console.error('Error reading recipes:', error);
+    return [];
+  }
+}
+
+export function saveRecipes(items: RecipeItem[]): boolean {
+  ensureRecipesFile();
+  try {
+    const tempFile = `${RECIPES_FILE}.tmp`;
+    fs.writeFileSync(tempFile, JSON.stringify(items, null, 2), 'utf-8');
+    fs.renameSync(tempFile, RECIPES_FILE);
+    return true;
+  } catch (error) {
+    console.error('Error saving recipes:', error);
+    return false;
+  }
+}
+
+export function addRecipe(recipe: Omit<RecipeItem, 'id'> & { id?: string }): RecipeItem[] {
+  const current = getRecipes();
+  const id = recipe.id || `recipe-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+  const order = recipe.order !== undefined ? recipe.order : current.length + 1;
+  const newRecipe: RecipeItem = { ...recipe, id, order };
+  const updated = [newRecipe, ...current].map((it, idx) => ({ ...it, order: idx + 1 }));
+  saveRecipes(updated);
+  return updated;
+}
+
+export function updateRecipe(id: string, updates: Partial<RecipeItem>): RecipeItem | null {
+  const current = getRecipes();
+  const index = current.findIndex(r => r.id === id);
+  if (index === -1) return null;
+  current[index] = { ...current[index], ...updates };
+  saveRecipes(current);
+  return current[index];
+}
+
+export function deleteRecipe(id: string): RecipeItem[] {
+  const current = getRecipes();
+  const filtered = current.filter(r => r.id !== id);
+  saveRecipes(filtered);
+  return filtered;
 }

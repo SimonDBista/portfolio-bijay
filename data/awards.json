@@ -1,0 +1,98 @@
+[
+  {
+    "id": "award-haccp",
+    "title": "Food Hygiene & Safety Level 3 Certification",
+    "category": "International Certification",
+    "organization": "Training Express (UK Standards)",
+    "year": "2022",
+    "level": "Advanced Merit Level",
+    "icon": "shield",
+    "description": "Accredited international qualification covering advanced HACCP principles, food safety management systems, hazard prevention, temperature controls, and sterile cross-contamination defense.",
+    "highlights": [
+      "Comprehensive HACCP compliance & inspection readiness",
+      "Advanced temperature critical control point (CCP) governance",
+      "Sanitation protocols for high-capacity banquet kitchens"
+    ],
+    "order": 1
+  },
+  {
+    "id": "award-kihm",
+    "title": "Professional Cook Certification of Excellence",
+    "category": "Culinary Distinction",
+    "organization": "Kathmandu Institute of Hospitality Management",
+    "year": "2018",
+    "level": "Graduated with Distinction",
+    "icon": "trophy",
+    "description": "Comprehensive professional culinary arts training with distinction across classical European knife fundamentals, French mother sauce craft, continental cuisine fabrication, and kitchen operations.",
+    "highlights": [
+      "Classic French culinary foundation & mother sauces",
+      "High-velocity commercial line station discipline",
+      "Artisanal butchery, poultry, and seafood fabrication"
+    ],
+    "order": 2
+  },
+  {
+    "id": "award-kuwait",
+    "title": "Line Station Leadership & Brigade Commendation",
+    "category": "Executive Recognition",
+    "organization": "Swiss Forevermore (Kuwait)",
+    "year": "2023 – 2025",
+    "level": "CDP Operational Honor",
+    "icon": "award",
+    "description": "Commended for impeccable line ticket management, station efficiency, recipe standardization, and managing central kitchen requisitioning under high-pressure commercial volume.",
+    "highlights": [
+      "Zero-defect ticket dispatch during peak line rush",
+      "Seamless multi-cultural brigade coordination",
+      "Ingredient yield optimization & waste minimization"
+    ],
+    "order": 3
+  },
+  {
+    "id": "award-instructor",
+    "title": "Culinary Pedagogy & Mentorship Award",
+    "category": "Academic Honor",
+    "organization": "Kumakh College of Management & Technical Science",
+    "year": "2021 – 2023",
+    "level": "Distinguished Instructor",
+    "icon": "grad",
+    "description": "Honored for exceptional culinary curriculum engineering and mentoring student cohorts into certified professional kitchen careers across luxury hotel chains worldwide.",
+    "highlights": [
+      "Authored hands-on practical culinary syllabi",
+      "Demonstrated modern plating aesthetics & sanitation",
+      "Mentored 100+ hospitality students for international stages"
+    ],
+    "order": 4
+  },
+  {
+    "id": "award-resort",
+    "title": "Luxury Himalayan Resort Culinary Excellence",
+    "category": "Resort Gastronomy",
+    "organization": "Hotel Mystic Mountain (Nagarkot, Nepal)",
+    "year": "2017 – 2020",
+    "level": "Commis to Senior Station Lead",
+    "icon": "star",
+    "description": "Promoted across multiple stations from culinary trainee through Commis II and Commis I for unwavering plate consistency, artisanal salad fabrication, and luxury banquet execution.",
+    "highlights": [
+      "Delivered 5-star mountain resort banquet operations",
+      "Mastered artisanal garnishes & intricate buffet centerpieces",
+      "Upheld strict food cost targets under Executive Chef guidelines"
+    ],
+    "order": 5
+  },
+  {
+    "id": "award-academic",
+    "title": "Higher Secondary Academic Achievement (+2)",
+    "category": "Educational Milestone",
+    "organization": "Shree Swet Baraha Secondary School",
+    "year": "2020",
+    "level": "Academic Honor",
+    "icon": "grad",
+    "description": "Higher secondary academic credentials successfully completed in Nepal with verified merit and demonstrated dedication to academic and career excellence.",
+    "highlights": [
+      "Formal academic foundation in hospitality sciences",
+      "Demonstrated leadership & school student representation",
+      "Solidified pathway to executive culinary specializations"
+    ],
+    "order": 6
+  }
+]
