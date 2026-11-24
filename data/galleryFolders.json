@@ -1,0 +1,222 @@
+[
+  {
+    "id": "event-kuwait",
+    "name": "Kuwait Executive Banquets & Line Service",
+    "description": "High-volume international fine dining brigade execution, modern gastronomy plate passes, and luxury banquet service at Swiss Forevermore, Kuwait.",
+    "date": "Kuwait • 2023 – 2025",
+    "coverImage": "/images/gallery/creation-04.jpg",
+    "order": 1,
+    "images": [
+      {
+        "id": "kw-1",
+        "title": "Pan-Seared Salmon with Saffron Velouté",
+        "url": "/images/gallery/creation-04.jpg",
+        "thumbnailUrl": "/images/gallery/creation-04.jpg",
+        "category": "Seafood Special",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      },
+      {
+        "id": "kw-2",
+        "title": "Executive Banquet Line Service",
+        "url": "/images/gallery/creation-02.jpg",
+        "thumbnailUrl": "/images/gallery/creation-02.jpg",
+        "category": "Brigade Operations",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      },
+      {
+        "id": "kw-3",
+        "title": "Herb-Infused Lamb Cutlet Plating",
+        "url": "/images/gallery/creation-01.jpg",
+        "thumbnailUrl": "/images/gallery/creation-01.jpg",
+        "category": "Meat Entrée",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      },
+      {
+        "id": "kw-4",
+        "title": "Artisanal Canapés Display",
+        "url": "/images/gallery/creation-06.jpg",
+        "thumbnailUrl": "/images/gallery/creation-06.jpg",
+        "category": "Hors d'œuvre",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      },
+      {
+        "id": "kw-5",
+        "title": "Sauce Reduction Precision",
+        "url": "/images/gallery/creation-03.jpg",
+        "thumbnailUrl": "/images/gallery/creation-03.jpg",
+        "category": "Technique",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      }
+    ]
+  },
+  {
+    "id": "event-mystic-mountain",
+    "name": "Hotel Mystic Mountain Galas & Buffets",
+    "description": "Luxury Himalayan resort gastronomy, live cooking carving stations, and artisanal banquet presentations in Nagarkot, Nepal.",
+    "date": "Nagarkot, Nepal • 2017 – 2020",
+    "coverImage": "/images/gallery/creation-01.jpg",
+    "order": 2,
+    "images": [
+      {
+        "id": "mm-1",
+        "title": "Herb-Crusted Rack of Lamb",
+        "url": "/images/gallery/creation-01.jpg",
+        "thumbnailUrl": "/images/gallery/creation-01.jpg",
+        "category": "Resort Signature",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      },
+      {
+        "id": "mm-2",
+        "title": "Gourmet Live Carving Station",
+        "url": "/images/gallery/creation-05.jpg",
+        "thumbnailUrl": "/images/gallery/creation-05.jpg",
+        "category": "Banquet Station",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      },
+      {
+        "id": "mm-3",
+        "title": "Cold Cuts & Artisanal Antipasti",
+        "url": "/images/gallery/creation-06.jpg",
+        "thumbnailUrl": "/images/gallery/creation-06.jpg",
+        "category": "Buffet Artistry",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      },
+      {
+        "id": "mm-4",
+        "title": "Seafood Tasting Platter",
+        "url": "/images/gallery/creation-04.jpg",
+        "thumbnailUrl": "/images/gallery/creation-04.jpg",
+        "category": "Seafood",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      },
+      {
+        "id": "mm-5",
+        "title": "Executive Salad Fabrication",
+        "url": "/images/gallery/creation-02.jpg",
+        "thumbnailUrl": "/images/gallery/creation-02.jpg",
+        "category": "Garde Manger",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      }
+    ]
+  },
+  {
+    "id": "event-plating-masterclass",
+    "name": "Modern Gastronomy & Plating Artistry",
+    "description": "Contemporary plating architecture, French mother sauce reductions, delicate herb oil teardrops, and edible botanical garnishes.",
+    "date": "Executive Showcase",
+    "coverImage": "/images/gallery/creation-03.jpg",
+    "order": 3,
+    "images": [
+      {
+        "id": "pm-1",
+        "title": "Minimalist Saffron Emulsion Drop",
+        "url": "/images/gallery/creation-03.jpg",
+        "thumbnailUrl": "/images/gallery/creation-03.jpg",
+        "category": "Plating Artistry",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      },
+      {
+        "id": "pm-2",
+        "title": "Seared Atlantic Salmon Glass Skin",
+        "url": "/images/gallery/creation-04.jpg",
+        "thumbnailUrl": "/images/gallery/creation-04.jpg",
+        "category": "Fine Dining",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      },
+      {
+        "id": "pm-3",
+        "title": "Fondant Potato & Lamb Harmony",
+        "url": "/images/gallery/creation-01.jpg",
+        "thumbnailUrl": "/images/gallery/creation-01.jpg",
+        "category": "Gourmet Entrée",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      },
+      {
+        "id": "pm-4",
+        "title": "Wild Forest Fungi Risotto",
+        "url": "/images/gallery/creation-06.jpg",
+        "thumbnailUrl": "/images/gallery/creation-06.jpg",
+        "category": "Continental",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      }
+    ]
+  },
+  {
+    "id": "event-heritage-fusion",
+    "name": "Himalayan Heritage & Culinary Workshops",
+    "description": "Elevated indigenous gastronomy, wild mountain timur pairings, and professional culinary pedagogy demonstrations at Kumakh College.",
+    "date": "Kumakh College • 2021 – 2023",
+    "coverImage": "/images/gallery/creation-05.jpg",
+    "order": 4,
+    "images": [
+      {
+        "id": "hf-1",
+        "title": "Artisanal Himalayan Momo Steaming",
+        "url": "/images/gallery/creation-05.jpg",
+        "thumbnailUrl": "/images/gallery/creation-05.jpg",
+        "category": "Heritage Fusion",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      },
+      {
+        "id": "hf-2",
+        "title": "Charred Timur Relish Preparation",
+        "url": "/images/gallery/creation-02.jpg",
+        "thumbnailUrl": "/images/gallery/creation-02.jpg",
+        "category": "Regional Spices",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      },
+      {
+        "id": "hf-3",
+        "title": "Student Culinary Workshop Masterclass",
+        "url": "/images/gallery/creation-03.jpg",
+        "thumbnailUrl": "/images/gallery/creation-03.jpg",
+        "category": "Pedagogy",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      },
+      {
+        "id": "hf-4",
+        "title": "Knife Skill & Fabrication Demo",
+        "url": "/images/gallery/creation-01.jpg",
+        "thumbnailUrl": "/images/gallery/creation-01.jpg",
+        "category": "Technique",
+        "width": 1152,
+        "height": 864,
+        "aspectRatio": 1.33
+      }
+    ]
+  }
+]

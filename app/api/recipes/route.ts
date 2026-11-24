@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getRecipes, addRecipe, RecipeItem } from '@/lib/db';
+import { processAndSaveImage } from '@/lib/imageProcessor';
 import { verifyToken } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
@@ -24,41 +25,40 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const {
-      title,
-      category,
-      course,
-      image,
-      prepTime,
-      cookTime,
-      servings,
-      difficulty,
-      description,
-      ingredients,
-      instructions,
-      platingNotes,
-      chefSecret,
-    } = body;
+    const contentType = request.headers.get('content-type') || '';
+    let title = '';
+    let description = '';
+    let imageUrl = '/images/gallery/creation-04.jpg';
 
-    if (!title) {
+    if (contentType.includes('multipart/form-data')) {
+      const formData = await request.formData();
+      title = (formData.get('title') as string) || '';
+      description = (formData.get('description') as string) || '';
+      const existingImage = formData.get('image') as string;
+      const file = formData.get('file') as File | null;
+
+      if (file && typeof file !== 'string' && file.size > 0) {
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const processed = await processAndSaveImage(buffer, file.name, file.type);
+        imageUrl = processed.url;
+      } else if (existingImage) {
+        imageUrl = existingImage;
+      }
+    } else {
+      const body = await request.json();
+      title = body.title || '';
+      description = body.description || '';
+      if (body.image) imageUrl = body.image;
+    }
+
+    if (!title.trim()) {
       return NextResponse.json({ error: 'Recipe title is required' }, { status: 400 });
     }
 
-    const newRecipe = {
+    const newRecipe: Omit<RecipeItem, 'id'> = {
       title: title.trim(),
-      category: category || 'Fine Dining',
-      course: course || 'Signature Entrée',
-      image: image || '/images/gallery/creation-04.jpg',
-      prepTime: prepTime || '20 mins',
-      cookTime: cookTime || '25 mins',
-      servings: servings || '2 Servings',
-      difficulty: difficulty || 'Master',
-      description: description || '',
-      ingredients: Array.isArray(ingredients) ? ingredients : [],
-      instructions: Array.isArray(instructions) ? instructions : [],
-      platingNotes: platingNotes || '',
-      chefSecret: chefSecret || '',
+      image: imageUrl,
+      description: description.trim(),
     };
 
     const updated = addRecipe(newRecipe);

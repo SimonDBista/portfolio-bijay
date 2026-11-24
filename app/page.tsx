@@ -9,7 +9,7 @@ import ExperienceTimeline from '@/components/ExperienceTimeline';
 import SpecialtiesSection from '@/components/SpecialtiesSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
-import { getGalleryItems, getChefProfile, getAwards, getRecipes } from '@/lib/db';
+import { getGalleryItems, getChefProfile, getAwards, getRecipes, getEventFolders } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0; // Always serve fresh dynamic content
@@ -19,6 +19,7 @@ export default function HomePage() {
   const chefProfile = getChefProfile();
   const initialAwards = getAwards();
   const initialRecipes = getRecipes();
+  const initialFolders = getEventFolders();
 
   return (
     <main className="min-h-screen bg-[#09090b] text-[#f4efe6] selection:bg-[#c9a96e] selection:text-[#09090b]">
@@ -34,11 +35,11 @@ export default function HomePage() {
       {/* Honors, Accreditations & Distinction Awards (Top Section - Fully Editable in Admin) */}
       <AwardsSection initialAwards={initialAwards} />
 
-      {/* Signature Master Recipes with Ingredients & Method Drawer (Top Section - Fully Editable in Admin) */}
+      {/* Signature Master Recipes with Picture and Little Description (Top Section - Fully Editable in Admin) */}
       <RecipesSection initialRecipes={initialRecipes} />
 
-      {/* Signature Creations Gallery with Lightbox & Category Filters (Top Section - Fully Editable in Admin) */}
-      <CreationsGallery initialItems={initialGalleryItems} />
+      {/* Event Folders Gallery with Little Description Outside Each Folder (Top Section - Fully Editable in Admin) */}
+      <CreationsGallery initialFolders={initialFolders} initialItems={initialGalleryItems} />
 
       {/* Career Timeline, Pedagogy & References (Fully Editable in Admin) */}
       <ExperienceTimeline profile={chefProfile} />

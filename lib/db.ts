@@ -21,6 +21,7 @@ const DATA_FILE = path.join(process.cwd(), 'data', 'gallery.json');
 const PROFILE_FILE = path.join(process.cwd(), 'data', 'chefProfile.json');
 const AWARDS_FILE = path.join(process.cwd(), 'data', 'awards.json');
 const RECIPES_FILE = path.join(process.cwd(), 'data', 'recipes.json');
+const FOLDERS_FILE = path.join(process.cwd(), 'data', 'galleryFolders.json');
 
 export interface AwardItem {
   id: string;
@@ -38,25 +39,20 @@ export interface AwardItem {
 export interface RecipeItem {
   id: string;
   title: string;
-  category: 'Fine Dining' | 'Meat Special' | 'Continental' | 'Heritage Fusion';
-  course: string;
   image: string;
-  prepTime: string;
-  cookTime: string;
-  servings: string;
-  difficulty: 'Executive' | 'Master' | 'Intermediate' | 'Artisan';
   description: string;
-  ingredients: {
-    section: string;
-    items: string[];
-  }[];
-  instructions: {
-    step: number;
-    title: string;
-    details: string;
-  }[];
-  platingNotes: string;
-  chefSecret: string;
+  category?: string;
+  order?: number;
+}
+
+export interface EventFolder {
+  id: string;
+  name: string;
+  description: string;
+  coverImage: string;
+  date?: string;
+  location?: string;
+  images: GalleryItem[];
   order?: number;
 }
 
@@ -87,6 +83,16 @@ function ensureRecipesFile(): void {
   }
   if (!fs.existsSync(RECIPES_FILE)) {
     fs.writeFileSync(RECIPES_FILE, '[]', 'utf-8');
+  }
+}
+
+function ensureFoldersFile(): void {
+  const dir = path.dirname(FOLDERS_FILE);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  if (!fs.existsSync(FOLDERS_FILE)) {
+    fs.writeFileSync(FOLDERS_FILE, '[]', 'utf-8');
   }
 }
 
@@ -453,4 +459,86 @@ export function deleteRecipe(id: string): RecipeItem[] {
   const filtered = current.filter(r => r.id !== id);
   saveRecipes(filtered);
   return filtered;
+}
+
+// ---------------- EVENT FOLDERS GALLERY OPERATIONS ---------------- //
+
+export function getEventFolders(): EventFolder[] {
+  ensureFoldersFile();
+  try {
+    const raw = fs.readFileSync(FOLDERS_FILE, 'utf-8');
+    const folders: EventFolder[] = JSON.parse(raw);
+    return folders.sort((a, b) => (a.order || 0) - (b.order || 0));
+  } catch (error) {
+    console.error('Error reading event folders:', error);
+    return [];
+  }
+}
+
+export function saveEventFolders(folders: EventFolder[]): boolean {
+  ensureFoldersFile();
+  try {
+    const tempFile = `${FOLDERS_FILE}.tmp`;
+    fs.writeFileSync(tempFile, JSON.stringify(folders, null, 2), 'utf-8');
+    fs.renameSync(tempFile, FOLDERS_FILE);
+    return true;
+  } catch (error) {
+    console.error('Error saving event folders:', error);
+    return false;
+  }
+}
+
+export function addEventFolder(folder: Omit<EventFolder, 'id' | 'images'> & { id?: string; images?: GalleryItem[] }): EventFolder[] {
+  const current = getEventFolders();
+  const id = folder.id || `event-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+  const order = folder.order !== undefined ? folder.order : current.length + 1;
+  const newFolder: EventFolder = {
+    ...folder,
+    id,
+    order,
+    images: folder.images || [],
+  };
+  const updated = [newFolder, ...current].map((f, idx) => ({ ...f, order: idx + 1 }));
+  saveEventFolders(updated);
+  return updated;
+}
+
+export function updateEventFolder(id: string, updates: Partial<EventFolder>): EventFolder | null {
+  const current = getEventFolders();
+  const index = current.findIndex(f => f.id === id);
+  if (index === -1) return null;
+  current[index] = { ...current[index], ...updates };
+  saveEventFolders(current);
+  return current[index];
+}
+
+export function deleteEventFolder(id: string): EventFolder[] {
+  const current = getEventFolders();
+  const filtered = current.filter(f => f.id !== id);
+  saveEventFolders(filtered);
+  return filtered;
+}
+
+export function addImagesToEventFolder(folderId: string, newImages: GalleryItem[]): EventFolder | null {
+  const current = getEventFolders();
+  const index = current.findIndex(f => f.id === folderId);
+  if (index === -1) return null;
+
+  const existingImages = current[index].images || [];
+  current[index].images = [...newImages, ...existingImages];
+  if (!current[index].coverImage && newImages.length > 0) {
+    current[index].coverImage = newImages[0].url;
+  }
+  saveEventFolders(current);
+  return current[index];
+}
+
+export function deleteImageFromEventFolder(folderId: string, imageId: string): EventFolder | null {
+  const current = getEventFolders();
+  const index = current.findIndex(f => f.id === folderId);
+  if (index === -1) return null;
+
+  current[index].images = (current[index].images || []).filter(img => img.id !== imageId);
+  saveEventFolders(current);
+  return current[index];
 }
