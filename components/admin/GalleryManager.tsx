@@ -43,6 +43,7 @@ import {
   Clock,
   MessageSquare,
   Sliders,
+  User,
   FileText,
   PhoneCall,
   Download,
@@ -52,51 +53,77 @@ import {
 
 // Client-side image compression helper: shrinks large photos before transmission
 async function compressImageClientSide(file: File, maxDim = 1920, quality = 0.82): Promise<File> {
-  if (!file || !file.type.startsWith('image/')) return file;
+  if (!file || !file.type || !file.type.toLowerCase().startsWith('image/')) return file;
   return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new window.Image();
-      img.onload = () => {
-        let { width, height } = img;
-        if (width > maxDim || height > maxDim) {
-          if (width > height) {
-            height = Math.round((height * maxDim) / width);
-            width = maxDim;
-          } else {
-            width = Math.round((width * maxDim) / height);
-            height = maxDim;
-          }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          resolve(file);
-          return;
-        }
-        ctx.drawImage(img, 0, 0, width, height);
-        canvas.toBlob(
-          (blob) => {
-            if (!blob) {
+    // 1500ms safety timeout: if canvas takes too long or fails, fall back to the original file
+    const timeout = setTimeout(() => resolve(file), 1500);
+
+    try {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const img = new window.Image();
+          img.onload = () => {
+            try {
+              let { width, height } = img;
+              if (width > maxDim || height > maxDim) {
+                if (width > height) {
+                  height = Math.round((height * maxDim) / width);
+                  width = maxDim;
+                } else {
+                  width = Math.round((width * maxDim) / height);
+                  height = maxDim;
+                }
+              }
+              const canvas = document.createElement('canvas');
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              if (!ctx) {
+                clearTimeout(timeout);
+                resolve(file);
+                return;
+              }
+              ctx.drawImage(img, 0, 0, width, height);
+              canvas.toBlob(
+                (blob) => {
+                  clearTimeout(timeout);
+                  if (!blob) {
+                    resolve(file);
+                    return;
+                  }
+                  const cleanBase = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+                  const newName = `${cleanBase}.webp`;
+                  const compressedFile = new File([blob], newName, { type: 'image/webp' });
+                  resolve(compressedFile);
+                },
+                'image/webp',
+                quality
+              );
+            } catch (err) {
+              clearTimeout(timeout);
               resolve(file);
-              return;
             }
-            const cleanBase = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
-            const newName = `${cleanBase}.webp`;
-            const compressedFile = new File([blob], newName, { type: 'image/webp' });
-            resolve(compressedFile);
-          },
-          'image/webp',
-          quality
-        );
+          };
+          img.onerror = () => {
+            clearTimeout(timeout);
+            resolve(file);
+          };
+          img.src = e.target?.result as string;
+        } catch (err) {
+          clearTimeout(timeout);
+          resolve(file);
+        }
       };
-      img.onerror = () => resolve(file);
-      img.src = e.target?.result as string;
-    };
-    reader.onerror = () => resolve(file);
-    reader.readAsDataURL(file);
+      reader.onerror = () => {
+        clearTimeout(timeout);
+        resolve(file);
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      clearTimeout(timeout);
+      resolve(file);
+    }
   });
 }
 
@@ -127,7 +154,7 @@ export default function GalleryManager({
   const folderFileInputRef = useRef<HTMLInputElement>(null);
 
   // Active Admin Tab
-  const [activeTab, setActiveTab] = useState<'gallery' | 'hero' | 'contact' | 'awards' | 'recipes' | 'inquiries' | 'about' | 'experience' | 'education'>('gallery');
+  const [activeTab, setActiveTab] = useState<'gallery' | 'hero' | 'profilePhoto' | 'contact' | 'awards' | 'recipes' | 'inquiries' | 'about' | 'experience' | 'education'>('gallery');
 
   // Status & Feedback
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -158,8 +185,10 @@ export default function GalleryManager({
   const [uploadingCv, setUploadingCv] = useState(false);
   const cvFileInputRef = useRef<HTMLInputElement>(null);
 
-  // ---------------- PORTRAIT PHOTO (ABOUT TAB) ---------------- //
+  // ---------------- PORTRAIT PHOTO STATE ---------------- //
   const [portraitLoading, setPortraitLoading] = useState(false);
+  const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
+  const [profilePhotoPreview, setProfilePhotoPreview] = useState<string>('');
   const portraitFileInputRef = useRef<HTMLInputElement>(null);
 
   // ---------------- TAB 1: GALLERY & EVENT FOLDERS STATE ---------------- //
@@ -676,10 +705,20 @@ export default function GalleryManager({
   const handleUploadPortrait = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || !e.target.files[0]) return;
     const rawFile = e.target.files[0];
+    setProfilePhotoFile(rawFile);
+    setProfilePhotoPreview(URL.createObjectURL(rawFile));
+  };
+
+  const handleSaveProfilePhotoFromPc = async (fileToUpload?: File) => {
+    const file = fileToUpload || profilePhotoFile;
+    if (!file) {
+      setStatusMessage({ type: 'error', text: 'Please choose a profile picture from your PC first.' });
+      return;
+    }
     setPortraitLoading(true);
     setStatusMessage(null);
     try {
-      const compressed = await compressImageClientSide(rawFile, 1920, 0.85);
+      const compressed = await compressImageClientSide(file, 1920, 0.85);
       const formData = new FormData();
       formData.append('file', compressed);
       const res = await fetch('/api/profile/bio-image', {
@@ -687,11 +726,13 @@ export default function GalleryManager({
         body: formData,
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to upload portrait photo');
+      if (!res.ok) throw new Error(data.error || 'Failed to upload profile photo');
       if (data.profile) setProfile(data.profile);
-      setStatusMessage({ type: 'success', text: 'Portrait photograph updated and compressed to WebP!' });
+      setProfilePhotoFile(null);
+      setProfilePhotoPreview('');
+      setStatusMessage({ type: 'success', text: 'Profile picture uploaded from PC and live on website!' });
     } catch (err: any) {
-      setStatusMessage({ type: 'error', text: err.message || 'Failed to update portrait photograph' });
+      setStatusMessage({ type: 'error', text: err.message || 'Failed to update profile picture' });
     } finally {
       setPortraitLoading(false);
       if (portraitFileInputRef.current) portraitFileInputRef.current.value = '';
@@ -1431,6 +1472,17 @@ export default function GalleryManager({
         >
           <Folder className="w-4 h-4" />
           <span>Photo Gallery ({folders.length})</span>
+        </button>
+
+        <button
+          onClick={() => { setActiveTab('profilePhoto'); setStatusMessage(null); }}
+          className={`flex items-center space-x-2 px-4 py-2.5 text-xs uppercase tracking-wider font-medium transition-all ${activeTab === 'profilePhoto'
+            ? 'bg-[#c9a96e] text-[#09090b] font-semibold shadow-md'
+            : 'bg-[#121217] text-[#ded8cd]/70 hover:text-white border border-white/5'
+            }`}
+        >
+          <User className="w-4 h-4 text-[#c9a96e]" />
+          <span>Profile Picture</span>
         </button>
 
         <button
@@ -3263,6 +3315,139 @@ export default function GalleryManager({
       {/* ======================================================== */}
       {/* ------------- TAB: HOME PICTURES (3 HERO) ------------- */}
       {/* ======================================================== */}
+      
+      {/* ======================================================== */}
+      {/* ----------- TAB: CHEF PROFILE PICTURE FROM PC ---------- */}
+      {/* ======================================================== */}
+      {activeTab === 'profilePhoto' && (
+        <section className="space-y-8 animate-fade-in">
+          <div className="pb-6 border-b border-white/10">
+            <div className="flex items-center space-x-3">
+              <h2 className="font-serif text-2xl text-[#f4efe6]">
+                Executive Chef Profile &amp; Portrait Photograph
+              </h2>
+              <span className="px-2.5 py-0.5 bg-[#c9a96e]/10 border border-[#c9a96e]/30 text-[#c9a96e] text-[10px] uppercase font-mono tracking-wider">
+                Homepage About Section
+              </span>
+            </div>
+            <p className="text-xs text-[#8c887e] mt-1">
+              Select your official chef portrait directly from your PC. This photograph appears prominently on the homepage &ldquo;About the Executive Chef&rdquo; section and across your professional credentials.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Left Column: Current Active Profile Photo */}
+            <div className="lg:col-span-5 bg-[#101015] border border-white/10 p-6 md:p-8 shadow-2xl space-y-4">
+              <span className="text-[10px] uppercase font-mono tracking-widest text-[#c9a96e] block">
+                Current Live Picture
+              </span>
+              <div className="relative aspect-[4/5] bg-black border border-white/10 overflow-hidden shadow-xl">
+                <Image
+                  src={profile.bioImage || '/images/chef/bijaya-ghimire.jpg'}
+                  alt="Executive Chef Portrait"
+                  fill
+                  className="object-cover object-top"
+                />
+                <div className="absolute top-3 left-3 px-2 py-0.5 bg-black/80 text-[10px] font-mono text-emerald-400 border border-emerald-500/30">
+                  Active on Website
+                </div>
+              </div>
+              <div className="text-[11px] text-[#8c887e] font-mono break-all bg-[#0a0a0d] p-2 border border-white/5">
+                Path: {profile.bioImage || '/images/chef/bijaya-ghimire.jpg'}
+              </div>
+            </div>
+
+            {/* Right Column: Select & Upload from PC */}
+            <div className="lg:col-span-7 bg-[#101015] border border-[#c9a96e]/30 p-6 md:p-8 shadow-2xl space-y-6">
+              <div className="pb-4 border-b border-white/10">
+                <span className="text-[10px] uppercase font-mono tracking-widest text-[#c9a96e] block">
+                  Select from Computer
+                </span>
+                <h3 className="font-serif text-xl text-white mt-1">
+                  Choose New Profile Photo from PC
+                </h3>
+                <p className="text-xs text-[#8c887e] mt-1">
+                  Upload any JPG, PNG, or WebP photo from your computer. It is automatically compressed to high-efficiency WebP and goes live immediately.
+                </p>
+              </div>
+
+              {/* File Selector Zone */}
+              <label className="flex flex-col items-center justify-center border-2 border-dashed border-[#c9a96e]/40 hover:border-[#c9a96e] bg-[#14141c] hover:bg-[#181824] p-8 cursor-pointer transition-all group">
+                <Camera className="w-10 h-10 text-[#c9a96e] mb-3 group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-medium text-white mb-1">
+                  Click to Choose Profile Photo from PC
+                </span>
+                <span className="text-xs text-[#8c887e]">
+                  or drag and drop your portrait picture here
+                </span>
+                <span className="text-[10px] text-[#c9a96e] mt-2 font-mono">
+                  Supports JPG, PNG, WebP up to 35MB • Auto-compressed
+                </span>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/jpg"
+                  onChange={handleUploadPortrait}
+                  className="hidden"
+                />
+              </label>
+
+              {/* Selected Preview Box */}
+              {profilePhotoPreview && (
+                <div className="bg-[#14141c] border border-white/10 p-4 space-y-4 animate-fade-in">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-[#c9a96e] font-medium">Selected Picture Preview:</span>
+                    <span className="text-[#8c887e] font-mono">
+                      {profilePhotoFile?.name} ({(profilePhotoFile?.size ? profilePhotoFile.size / (1024 * 1024) : 0).toFixed(2)} MB)
+                    </span>
+                  </div>
+
+                  <div className="relative w-40 aspect-[4/5] bg-black border border-[#c9a96e]/40 overflow-hidden shadow-lg mx-auto">
+                    <Image
+                      src={profilePhotoPreview}
+                      alt="Selected Preview"
+                      fill
+                      className="object-cover object-top"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-3 pt-2">
+                    <button
+                      type="button"
+                      disabled={portraitLoading}
+                      onClick={() => handleSaveProfilePhotoFromPc()}
+                      className="flex-1 py-3 bg-[#c9a96e] hover:bg-[#dfc28d] disabled:opacity-50 text-[#09090b] text-xs uppercase tracking-widest font-semibold transition-all shadow-lg flex items-center justify-center space-x-2"
+                    >
+                      {portraitLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Compressing &amp; Saving to Website...</span>
+                        </>
+                      ) : (
+                        <>
+                          <UploadCloud className="w-4 h-4" />
+                          <span>Upload &amp; Set as Live Profile Picture</span>
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProfilePhotoFile(null);
+                        setProfilePhotoPreview('');
+                      }}
+                      className="px-4 py-3 bg-[#181822] hover:bg-[#222230] text-xs text-[#8c887e] hover:text-white border border-white/10 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
       {activeTab === 'hero' && (
         <section className="space-y-8 animate-fade-in">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
