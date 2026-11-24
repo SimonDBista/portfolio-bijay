@@ -544,6 +544,20 @@ export function getEventFolders(): EventFolder[] {
   try {
     const raw = fs.readFileSync(FOLDERS_FILE, 'utf-8');
     const folders: EventFolder[] = JSON.parse(raw);
+    let modified = false;
+    for (const folder of folders) {
+      // Automatically ensure folder cover image is selected from uploaded images inside
+      if (folder.images && folder.images.length > 0) {
+        const hasValidCover = folder.images.some(img => img.url === folder.coverImage);
+        if (!hasValidCover || !folder.coverImage) {
+          folder.coverImage = folder.images[0].url;
+          modified = true;
+        }
+      }
+    }
+    if (modified) {
+      saveEventFolders(folders);
+    }
     return folders.sort((a, b) => (a.order || 0) - (b.order || 0));
   } catch (error) {
     console.error('Error reading event folders:', error);
@@ -568,11 +582,14 @@ export function addEventFolder(folder: Omit<EventFolder, 'id' | 'images'> & { id
   const current = getEventFolders();
   const id = folder.id || `event-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
   const order = folder.order !== undefined ? folder.order : current.length + 1;
+  const images = folder.images || [];
+  const coverImage = (images.length > 0 ? images[0].url : folder.coverImage) || '';
   const newFolder: EventFolder = {
     ...folder,
     id,
     order,
-    images: folder.images || [],
+    coverImage,
+    images,
   };
   const updated = [newFolder, ...current].map((f, idx) => ({ ...f, order: idx + 1 }));
   saveEventFolders(updated);
@@ -602,8 +619,11 @@ export function addImagesToEventFolder(folderId: string, newImages: GalleryItem[
 
   const existingImages = current[index].images || [];
   current[index].images = [...newImages, ...existingImages];
-  if (!current[index].coverImage && newImages.length > 0) {
+  // Automatically select the cover image from the newly uploaded photo inside
+  if (newImages.length > 0) {
     current[index].coverImage = newImages[0].url;
+  } else if (current[index].images.length > 0 && !current[index].coverImage) {
+    current[index].coverImage = current[index].images[0].url;
   }
   saveEventFolders(current);
   return current[index];
@@ -615,6 +635,15 @@ export function deleteImageFromEventFolder(folderId: string, imageId: string): E
   if (index === -1) return null;
 
   current[index].images = (current[index].images || []).filter(img => img.id !== imageId);
+  // If the cover was deleted, or no longer exists, automatically select from the remaining photos
+  if (current[index].images.length > 0) {
+    const hasValidCover = current[index].images.some(img => img.url === current[index].coverImage);
+    if (!hasValidCover || !current[index].coverImage) {
+      current[index].coverImage = current[index].images[0].url;
+    }
+  } else {
+    current[index].coverImage = '';
+  }
   saveEventFolders(current);
   return current[index];
 }

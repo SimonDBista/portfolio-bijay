@@ -103,7 +103,9 @@ export default function CreationsGallery({ initialFolders = [], initialItems = [
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
               {folders.map((folder) => {
                 const photoCount = folder.images ? folder.images.length : 0;
-                const cover = folder.coverImage || (folder.images && folder.images[0]?.url) || '/images/gallery/creation-01.jpg';
+                const cover = (folder.images && folder.images.length > 0
+                  ? (folder.images.find(img => img.url === folder.coverImage)?.url || folder.images[0]?.url)
+                  : folder.coverImage) || '/images/gallery/creation-01.jpg';
 
                 return (
                   <div

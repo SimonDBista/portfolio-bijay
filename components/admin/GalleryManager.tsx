@@ -1166,6 +1166,26 @@ export default function GalleryManager({
     }
   };
 
+  const handleSetFolderCover = async (folderId: string, imageUrl: string) => {
+    try {
+      const res = await fetch(`/api/gallery/folders/${folderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ coverImage: imageUrl }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update folder cover');
+
+      setFolders(data.folders);
+      if (activeAdminFolder && activeAdminFolder.id === folderId) {
+        setActiveAdminFolder(data.folder);
+      }
+      setStatusMessage({ type: 'success', text: 'Folder cover photograph selected successfully!' });
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: err.message || 'Error updating cover' });
+    }
+  };
+
   // ---------------- TAB 6: MASTER RECIPES HANDLERS (PICTURE + LITTLE DESCRIPTION) ---------------- //
   const openAddRecipe = () => {
     setEditingRecipe(null);
@@ -1554,7 +1574,9 @@ export default function GalleryManager({
               {/* Folders Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {folders.map((folder) => {
-                  const coverImg = folder.coverImage || folder.images?.[0]?.url || '/images/gallery/creation-01.jpg';
+                  const coverImg = (folder.images && folder.images.length > 0
+                    ? (folder.images.find(img => img.url === folder.coverImage)?.url || folder.images[0]?.url)
+                    : folder.coverImage) || '/images/gallery/creation-01.jpg';
                   const count = folder.images?.length || 0;
 
                   return (
@@ -1847,40 +1869,70 @@ export default function GalleryManager({
 
                 {activeAdminFolder.images && activeAdminFolder.images.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {activeAdminFolder.images.map((img, idx) => (
-                      <div
-                        key={img.id || idx}
-                        className="bg-[#14141a] border border-white/10 flex flex-col justify-between overflow-hidden group hover:border-[#c9a96e]/40 transition-colors shadow-lg"
-                      >
-                        <div className="relative aspect-[4/3] bg-black">
-                          <Image
-                            src={img.thumbnailUrl || img.url}
-                            alt={img.title || 'Event photo'}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 25vw"
-                          />
-                          <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-black/80 text-[9px] font-mono text-[#c9a96e] border border-white/10">
-                            #{idx + 1}
-                          </span>
-                        </div>
+                    {activeAdminFolder.images.map((img, idx) => {
+                      const isCover = (activeAdminFolder.coverImage === img.url) || (!activeAdminFolder.coverImage && idx === 0) || (activeAdminFolder.images?.find(i => i.url === activeAdminFolder.coverImage)?.url === img.url ? activeAdminFolder.coverImage === img.url : idx === 0);
 
-                        <div className="p-3 flex items-center justify-between gap-2 bg-[#0e0e14]">
-                          <span className="text-xs text-[#ded8cd] truncate font-light">
-                            {img.title || 'Event Photograph'}
-                          </span>
+                      return (
+                        <div
+                          key={img.id || idx}
+                          className={`bg-[#14141a] border flex flex-col justify-between overflow-hidden group transition-all shadow-lg ${
+                            isCover ? 'border-[#c9a96e] ring-1 ring-[#c9a96e]/50' : 'border-white/10 hover:border-[#c9a96e]/40'
+                          }`}
+                        >
+                          <div className="relative aspect-[4/3] bg-black">
+                            <Image
+                              src={img.thumbnailUrl || img.url}
+                              alt={img.title || 'Event photo'}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 100vw, 25vw"
+                            />
+                            <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-black/80 text-[9px] font-mono text-[#c9a96e] border border-white/10">
+                              #{idx + 1}
+                            </span>
+                            {isCover && (
+                              <span className="absolute top-2 right-2 px-2 py-0.5 bg-[#c9a96e] text-[#09090b] text-[9.5px] font-semibold uppercase tracking-wider shadow-md flex items-center space-x-1">
+                                <Star className="w-3 h-3 fill-current" />
+                                <span>Cover</span>
+                              </span>
+                            )}
+                          </div>
 
-                          <button
-                            type="button"
-                            onClick={() => handleDeletePhotoFromFolder(activeAdminFolder.id, img.id)}
-                            className="p-1 text-red-400 hover:text-red-300 hover:bg-red-950/40 border border-red-500/20 transition-colors"
-                            title="Remove photo from folder"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                          <div className="p-3 flex items-center justify-between gap-2 bg-[#0e0e14]">
+                            <span className="text-xs text-[#ded8cd] truncate font-light flex-1">
+                              {img.title || 'Event Photograph'}
+                            </span>
+
+                            <div className="flex items-center space-x-2 shrink-0">
+                              {!isCover ? (
+                                <button
+                                  type="button"
+                                  onClick={() => handleSetFolderCover(activeAdminFolder.id, img.url)}
+                                  className="text-[10px] text-[#ded8cd]/70 hover:text-[#c9a96e] border border-white/10 hover:border-[#c9a96e]/40 px-2 py-0.5 transition-colors"
+                                  title="Select as folder cover photograph"
+                                >
+                                  Set as Cover
+                                </button>
+                              ) : (
+                                <span className="text-[10px] text-[#c9a96e] font-mono uppercase tracking-wider flex items-center space-x-1">
+                                  <Check className="w-3 h-3" />
+                                  <span>Cover</span>
+                                </span>
+                              )}
+
+                              <button
+                                type="button"
+                                onClick={() => handleDeletePhotoFromFolder(activeAdminFolder.id, img.id)}
+                                className="p-1 text-red-400 hover:text-red-300 hover:bg-red-950/40 border border-red-500/20 transition-colors"
+                                title="Remove photo from folder"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="p-12 text-center border border-dashed border-white/10 text-xs text-[#8c887e]">
@@ -1938,15 +1990,20 @@ export default function GalleryManager({
 
                     <div>
                       <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1 font-medium">
-                        Cover Image URL
+                        Folder Cover Photograph
                       </label>
-                      <input
-                        type="text"
-                        value={folderForm.coverImage}
-                        onChange={(e) => setFolderForm({ ...folderForm, coverImage: e.target.value })}
-                        placeholder="/images/gallery/creation-01.jpg"
-                        className="w-full bg-[#181820] border border-white/10 px-3 py-2 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
-                      />
+                      <div className="bg-[#181820] border border-white/10 p-2 flex items-center space-x-2.5">
+                        <div className="w-8 h-8 relative bg-black/40 border border-white/10 overflow-hidden shrink-0">
+                          {folderForm.coverImage ? (
+                            <Image src={folderForm.coverImage} alt="Cover" fill className="object-cover" />
+                          ) : (
+                            <Folder className="w-4 h-4 text-[#c9a96e] m-auto mt-2" />
+                          )}
+                        </div>
+                        <span className="text-[11px] text-[#c9a96e] font-mono leading-tight">
+                          Auto-selected from uploaded photos
+                        </span>
+                      </div>
                     </div>
                   </div>
 
