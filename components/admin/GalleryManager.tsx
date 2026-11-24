@@ -4,7 +4,7 @@ import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { GalleryItem, AwardItem, RecipeItem, EventFolder, InquiryItem } from '@/lib/db';
+import { GalleryItem, AwardItem, RecipeItem, EventFolder, InquiryItem, HeroSlideItem } from '@/lib/db';
 import { ChefProfile, WorkExperience, EducationCert } from '@/data/chefData';
 import {
   UploadCloud,
@@ -41,8 +41,64 @@ import {
   Mail,
   Phone,
   Clock,
-  MessageSquare
+  MessageSquare,
+  Sliders,
+  FileText,
+  PhoneCall,
+  Download,
+  Camera,
+  MapPin
 } from 'lucide-react';
+
+// Client-side image compression helper: shrinks large photos before transmission
+async function compressImageClientSide(file: File, maxDim = 1920, quality = 0.82): Promise<File> {
+  if (!file || !file.type.startsWith('image/')) return file;
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new window.Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(file);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              resolve(file);
+              return;
+            }
+            const cleanBase = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+            const newName = `${cleanBase}.webp`;
+            const compressedFile = new File([blob], newName, { type: 'image/webp' });
+            resolve(compressedFile);
+          },
+          'image/webp',
+          quality
+        );
+      };
+      img.onerror = () => resolve(file);
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = () => resolve(file);
+    reader.readAsDataURL(file);
+  });
+}
 
 interface GalleryManagerProps {
   user: { username: string; role: string };
@@ -52,6 +108,7 @@ interface GalleryManagerProps {
   initialRecipes?: RecipeItem[];
   initialFolders?: EventFolder[];
   initialInquiries?: InquiryItem[];
+  initialHeroSlides?: HeroSlideItem[];
 }
 
 export default function GalleryManager({
@@ -61,7 +118,8 @@ export default function GalleryManager({
   initialAwards = [],
   initialRecipes = [],
   initialFolders = [],
-  initialInquiries = []
+  initialInquiries = [],
+  initialHeroSlides = []
 }: GalleryManagerProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -69,10 +127,40 @@ export default function GalleryManager({
   const folderFileInputRef = useRef<HTMLInputElement>(null);
 
   // Active Admin Tab
-  const [activeTab, setActiveTab] = useState<'gallery' | 'awards' | 'recipes' | 'inquiries' | 'about' | 'experience' | 'education'>('gallery');
+  const [activeTab, setActiveTab] = useState<'gallery' | 'hero' | 'contact' | 'awards' | 'recipes' | 'inquiries' | 'about' | 'experience' | 'education'>('gallery');
 
   // Status & Feedback
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // ---------------- TAB: HOME PICTURES (3 HERO SLIDES) STATE ---------------- //
+  const [heroSlides, setHeroSlides] = useState<HeroSlideItem[]>(initialHeroSlides);
+  const [editingSlide, setEditingSlide] = useState<HeroSlideItem | null>(null);
+  const [slideSubcaption, setSlideSubcaption] = useState('');
+  const [slideAlt, setSlideAlt] = useState('');
+  const [slideLoading, setSlideLoading] = useState(false);
+  const [replacingSlideId, setReplacingSlideId] = useState<string | null>(null);
+  const replaceSlideInputRef = useRef<HTMLInputElement>(null);
+
+  const [isAddingSlide, setIsAddingSlide] = useState(false);
+  const [newSlideFile, setNewSlideFile] = useState<File | null>(null);
+  const [newSlidePreview, setNewSlidePreview] = useState<string>('');
+  const [newSlideSubcaption, setNewSlideSubcaption] = useState('');
+  const [newSlideAlt, setNewSlideAlt] = useState('');
+
+  // ---------------- TAB: DIRECT CONTACT & CV STATE ---------------- //
+  const [contactEmail, setContactEmail] = useState(initialProfile.contact?.email || 'chef.ghimire@example.com');
+  const [contactPhone1, setContactPhone1] = useState(initialProfile.contact?.phones?.[0] || '+977 984-1234567');
+  const [contactPhone2, setContactPhone2] = useState(initialProfile.contact?.phones?.[1] || '+977 985-7654321');
+  const [contactLocation, setContactLocation] = useState(initialProfile.contact?.location || 'Kathmandu, Nepal & Global Deployments');
+  const [currentCvUrl, setCurrentCvUrl] = useState(initialProfile.contact?.cvUrl || '/docs/Bijaya_Ghimire_Executive_Chef_CV.pdf');
+  const [savingContact, setSavingContact] = useState(false);
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [uploadingCv, setUploadingCv] = useState(false);
+  const cvFileInputRef = useRef<HTMLInputElement>(null);
+
+  // ---------------- PORTRAIT PHOTO (ABOUT TAB) ---------------- //
+  const [portraitLoading, setPortraitLoading] = useState(false);
+  const portraitFileInputRef = useRef<HTMLInputElement>(null);
 
   // ---------------- TAB 1: GALLERY & EVENT FOLDERS STATE ---------------- //
   const [folders, setFolders] = useState<EventFolder[]>(initialFolders);
@@ -186,28 +274,32 @@ export default function GalleryManager({
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     const maxSizeBytes = 25 * 1024 * 1024;
 
-    for (const file of filesArray) {
-      if (!allowedTypes.includes(file.type.toLowerCase())) {
-        setStatusMessage({
-          type: 'error',
-          text: `Skipped "${file.name}": Unsupported format. Only JPG, PNG, and WebP are accepted.`,
-        });
-        continue;
-      }
-      if (file.size > maxSizeBytes) {
-        setStatusMessage({
-          type: 'error',
-          text: `Skipped "${file.name}": File size exceeds 25MB limit.`,
-        });
-        continue;
+    (async () => {
+      for (const file of filesArray) {
+        if (!allowedTypes.includes(file.type.toLowerCase())) {
+          setStatusMessage({
+            type: 'error',
+            text: `Skipped "${file.name}": Unsupported format. Only JPG, PNG, and WebP are accepted.`,
+          });
+          continue;
+        }
+        if (file.size > maxSizeBytes) {
+          setStatusMessage({
+            type: 'error',
+            text: `Skipped "${file.name}": File size exceeds 25MB limit.`,
+          });
+          continue;
+        }
+
+        // Compress photograph client-side to WebP before queuing
+        const compressed = await compressImageClientSide(file, 1920, 0.82);
+        validFiles.push(compressed);
+        validPreviews.push(URL.createObjectURL(compressed));
       }
 
-      validFiles.push(file);
-      validPreviews.push(URL.createObjectURL(file));
-    }
-
-    setSelectedFiles((prev) => [...prev, ...validFiles]);
-    setPreviews((prev) => [...prev, ...validPreviews]);
+      setSelectedFiles((prev) => [...prev, ...validFiles]);
+      setPreviews((prev) => [...prev, ...validPreviews]);
+    })();
   };
 
   const removeSelectedFile = (index: number) => {
@@ -324,8 +416,9 @@ export default function GalleryManager({
     setStatusMessage(null);
 
     try {
+      const compressed = await compressImageClientSide(file, 1920, 0.82);
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', compressed);
 
       const res = await fetch(`/api/gallery/${replacingItemId}/replace`, {
         method: 'POST',
@@ -400,6 +493,208 @@ export default function GalleryManager({
       });
     } catch (err) {
       console.error('Failed to sync reorder:', err);
+    }
+  };
+
+  // ---------------- TAB: HOME PICTURES (HERO SLIDES) HANDLERS ---------------- //
+  const handleOpenEditSlide = (slide: HeroSlideItem) => {
+    setEditingSlide(slide);
+    setSlideSubcaption(slide.subcaption || '');
+    setSlideAlt(slide.alt || '');
+  };
+
+  const handleSaveSlideText = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSlide) return;
+    setSlideLoading(true);
+    setStatusMessage(null);
+    try {
+      const res = await fetch(`/api/hero/${editingSlide.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subcaption: slideSubcaption, alt: slideAlt }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update home picture text');
+      if (data.slides) setHeroSlides(data.slides);
+      setStatusMessage({ type: 'success', text: 'Home picture caption updated successfully!' });
+      setEditingSlide(null);
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: err.message || 'Error updating home picture' });
+    } finally {
+      setSlideLoading(false);
+    }
+  };
+
+  const handleTriggerReplaceSlide = (slideId: string) => {
+    setReplacingSlideId(slideId);
+    if (replaceSlideInputRef.current) {
+      replaceSlideInputRef.current.value = '';
+      replaceSlideInputRef.current.click();
+    }
+  };
+
+  const handleReplaceSlideFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!replacingSlideId || !e.target.files || !e.target.files[0]) return;
+    const rawFile = e.target.files[0];
+    setSlideLoading(true);
+    setStatusMessage(null);
+    try {
+      const compressed = await compressImageClientSide(rawFile, 2048, 0.85);
+      const formData = new FormData();
+      formData.append('file', compressed);
+
+      const res = await fetch(`/api/hero/${replacingSlideId}`, {
+        method: 'PUT',
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to replace home picture');
+      if (data.slides) setHeroSlides(data.slides);
+      setStatusMessage({ type: 'success', text: 'Home picture replaced and compressed to WebP!' });
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: err.message || 'Error replacing home picture' });
+    } finally {
+      setSlideLoading(false);
+      setReplacingSlideId(null);
+      if (replaceSlideInputRef.current) replaceSlideInputRef.current.value = '';
+    }
+  };
+
+  const handleDeleteSlide = async (slideId: string) => {
+    if (!window.confirm('Are you sure you want to remove this home picture?')) return;
+    setSlideLoading(true);
+    setStatusMessage(null);
+    try {
+      const res = await fetch(`/api/hero/${slideId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete home picture');
+      if (data.slides) setHeroSlides(data.slides);
+      setStatusMessage({ type: 'success', text: 'Home picture removed successfully.' });
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: err.message || 'Error deleting home picture' });
+    } finally {
+      setSlideLoading(false);
+    }
+  };
+
+  const handleAddSlide = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newSlideFile && !newSlidePreview) {
+      setStatusMessage({ type: 'error', text: 'Please select an image file for the new home picture.' });
+      return;
+    }
+    setSlideLoading(true);
+    setStatusMessage(null);
+    try {
+      const formData = new FormData();
+      if (newSlideFile) {
+        const compressed = await compressImageClientSide(newSlideFile, 2048, 0.85);
+        formData.append('file', compressed);
+      }
+      formData.append('subcaption', newSlideSubcaption || 'Precision & Culinary Artistry');
+      formData.append('alt', newSlideAlt || 'Chef Bijaya Ghimire Showcase');
+
+      const res = await fetch('/api/hero', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to add home picture');
+      if (data.slides) setHeroSlides(data.slides);
+      setStatusMessage({ type: 'success', text: 'New home picture added and compressed successfully!' });
+      setIsAddingSlide(false);
+      setNewSlideFile(null);
+      setNewSlidePreview('');
+      setNewSlideSubcaption('');
+      setNewSlideAlt('');
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: err.message || 'Error adding home picture' });
+    } finally {
+      setSlideLoading(false);
+    }
+  };
+
+  // ---------------- TAB: DIRECT CONTACT & CV HANDLERS ---------------- //
+  const handleSaveContact = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingContact(true);
+    setStatusMessage(null);
+    try {
+      const phones = [contactPhone1.trim(), contactPhone2.trim()].filter(Boolean);
+      const res = await fetch('/api/profile/contact', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: contactEmail.trim(),
+          phones,
+          location: contactLocation.trim(),
+          cvUrl: currentCvUrl,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update contact info');
+      if (data.profile) setProfile(data.profile);
+      setStatusMessage({ type: 'success', text: 'Direct Contact details saved successfully!' });
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: err.message || 'Failed to update contact details' });
+    } finally {
+      setSavingContact(false);
+    }
+  };
+
+  const handleUploadCv = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cvFile) {
+      setStatusMessage({ type: 'error', text: 'Please choose a PDF document for the CV.' });
+      return;
+    }
+    setUploadingCv(true);
+    setStatusMessage(null);
+    try {
+      const formData = new FormData();
+      formData.append('file', cvFile);
+      const res = await fetch('/api/profile/cv', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to upload CV');
+      if (data.cvUrl) setCurrentCvUrl(data.cvUrl);
+      if (data.profile) setProfile(data.profile);
+      setCvFile(null);
+      if (cvFileInputRef.current) cvFileInputRef.current.value = '';
+      setStatusMessage({ type: 'success', text: 'New CV document uploaded successfully! The live portfolio download button has been updated.' });
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: err.message || 'Failed to upload CV' });
+    } finally {
+      setUploadingCv(false);
+    }
+  };
+
+  // ---------------- PORTRAIT HANDLER ---------------- //
+  const handleUploadPortrait = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0]) return;
+    const rawFile = e.target.files[0];
+    setPortraitLoading(true);
+    setStatusMessage(null);
+    try {
+      const compressed = await compressImageClientSide(rawFile, 1920, 0.85);
+      const formData = new FormData();
+      formData.append('file', compressed);
+      const res = await fetch('/api/profile/bio-image', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to upload portrait photo');
+      if (data.profile) setProfile(data.profile);
+      setStatusMessage({ type: 'success', text: 'Portrait photograph updated and compressed to WebP!' });
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: err.message || 'Failed to update portrait photograph' });
+    } finally {
+      setPortraitLoading(false);
+      if (portraitFileInputRef.current) portraitFileInputRef.current.value = '';
     }
   };
 
@@ -1041,12 +1336,30 @@ export default function GalleryManager({
 
   return (
     <div className="max-w-7xl mx-auto px-6 md:px-12 py-10">
-      {/* Hidden File Input for Image Replacement */}
+      {/* Hidden File Input for Gallery Image Replacement */}
       <input
         ref={replaceFileInputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp,image/jpg"
         onChange={handleReplaceFileSelected}
+        className="hidden"
+      />
+
+      {/* Hidden File Input for Hero Slide Image Replacement */}
+      <input
+        ref={replaceSlideInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/jpg"
+        onChange={handleReplaceSlideFile}
+        className="hidden"
+      />
+
+      {/* Hidden File Input for Portrait Replacement */}
+      <input
+        ref={portraitFileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/jpg"
+        onChange={handleUploadPortrait}
         className="hidden"
       />
 
@@ -1091,18 +1404,51 @@ export default function GalleryManager({
       <div className="flex flex-wrap gap-2 mb-8 border-b border-white/10 pb-4">
         <button
           onClick={() => { setActiveTab('gallery'); setStatusMessage(null); }}
-          className={`flex items-center space-x-2 px-5 py-2.5 text-xs uppercase tracking-wider font-medium transition-all ${activeTab === 'gallery'
+          className={`flex items-center space-x-2 px-4 py-2.5 text-xs uppercase tracking-wider font-medium transition-all ${activeTab === 'gallery'
             ? 'bg-[#c9a96e] text-[#09090b] font-semibold shadow-md'
             : 'bg-[#121217] text-[#ded8cd]/70 hover:text-white border border-white/5'
             }`}
         >
           <Folder className="w-4 h-4" />
-          <span>Event Folders ({folders.length})</span>
+          <span>Photo Gallery ({folders.length})</span>
+        </button>
+
+        <button
+          onClick={() => { setActiveTab('hero'); setStatusMessage(null); }}
+          className={`flex items-center space-x-2 px-4 py-2.5 text-xs uppercase tracking-wider font-medium transition-all ${activeTab === 'hero'
+            ? 'bg-[#c9a96e] text-[#09090b] font-semibold shadow-md'
+            : 'bg-[#121217] text-[#ded8cd]/70 hover:text-white border border-white/5'
+            }`}
+        >
+          <Camera className="w-4 h-4 text-[#c9a96e]" />
+          <span>Home Pictures ({heroSlides.length})</span>
+        </button>
+
+        <button
+          onClick={() => { setActiveTab('contact'); setStatusMessage(null); }}
+          className={`flex items-center space-x-2 px-4 py-2.5 text-xs uppercase tracking-wider font-medium transition-all ${activeTab === 'contact'
+            ? 'bg-[#c9a96e] text-[#09090b] font-semibold shadow-md'
+            : 'bg-[#121217] text-[#ded8cd]/70 hover:text-white border border-white/5'
+            }`}
+        >
+          <PhoneCall className="w-4 h-4 text-[#c9a96e]" />
+          <span>Direct Contact &amp; CV</span>
+        </button>
+
+        <button
+          onClick={() => { setActiveTab('recipes'); setStatusMessage(null); }}
+          className={`flex items-center space-x-2 px-4 py-2.5 text-xs uppercase tracking-wider font-medium transition-all ${activeTab === 'recipes'
+            ? 'bg-[#c9a96e] text-[#09090b] font-semibold shadow-md'
+            : 'bg-[#121217] text-[#ded8cd]/70 hover:text-white border border-white/5'
+            }`}
+        >
+          <ChefHat className="w-4 h-4" />
+          <span>Master Recipes ({recipes.length})</span>
         </button>
 
         <button
           onClick={() => { setActiveTab('awards'); setStatusMessage(null); }}
-          className={`flex items-center space-x-2 px-5 py-2.5 text-xs uppercase tracking-wider font-medium transition-all ${activeTab === 'awards'
+          className={`flex items-center space-x-2 px-4 py-2.5 text-xs uppercase tracking-wider font-medium transition-all ${activeTab === 'awards'
             ? 'bg-[#c9a96e] text-[#09090b] font-semibold shadow-md'
             : 'bg-[#121217] text-[#ded8cd]/70 hover:text-white border border-white/5'
             }`}
@@ -1111,16 +1457,7 @@ export default function GalleryManager({
           <span>Awards &amp; Honors ({awards.length})</span>
         </button>
 
-        <button
-          onClick={() => { setActiveTab('recipes'); setStatusMessage(null); }}
-          className={`flex items-center space-x-2 px-5 py-2.5 text-xs uppercase tracking-wider font-medium transition-all ${activeTab === 'recipes'
-            ? 'bg-[#c9a96e] text-[#09090b] font-semibold shadow-md'
-            : 'bg-[#121217] text-[#ded8cd]/70 hover:text-white border border-white/5'
-            }`}
-        >
-          <ChefHat className="w-4 h-4" />
-          <span>Master Recipes ({recipes.length})</span>
-        </button>
+
 
         <button
           onClick={() => { setActiveTab('inquiries'); setStatusMessage(null); }}
@@ -1655,14 +1992,55 @@ export default function GalleryManager({
       {/* TAB 2: ABOUT SECTION & HEADLINE EDITOR                        */}
       {/* ============================================================ */}
       {activeTab === 'about' && (
-        <section className="bg-[#101015] border border-white/10 p-6 md:p-8 shadow-2xl">
-          <div className="pb-6 border-b border-white/10 mb-6">
+        <section className="bg-[#101015] border border-white/10 p-6 md:p-8 shadow-2xl space-y-8">
+          <div className="pb-6 border-b border-white/10">
             <h2 className="font-serif text-2xl text-[#f4efe6] font-normal">
               Edit About Section &amp; Biography Narrative
             </h2>
             <p className="text-xs text-[#8c887e] mt-1">
-              Modify the headline (&ldquo;A Journey of Discipline, Precision, &amp; Plating Artistry&rdquo;), editorial quote, and biography paragraphs.
+              Modify the headline (&ldquo;A Journey of Discipline, Precision, &amp; Plating Artistry&rdquo;), editorial quote, biography paragraphs, and chef portrait photograph.
             </p>
+          </div>
+
+          {/* Portrait Photo Management Block */}
+          <div className="bg-[#14141c] p-6 border border-[#c9a96e]/30 flex flex-col md:flex-row items-center gap-6">
+            <div className="relative w-36 h-48 border border-white/15 bg-black/40 overflow-hidden shrink-0 shadow-lg group">
+              <Image
+                src={profile.bioImage || '/images/hero/portrait.jpg'}
+                alt="Executive Chef Portrait"
+                fill
+                className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+              />
+              {portraitLoading && (
+                <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center text-[#c9a96e] text-xs">
+                  <Loader2 className="w-5 h-5 animate-spin mb-1" />
+                  <span>Optimizing...</span>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-3 flex-1 text-center md:text-left">
+              <div>
+                <span className="text-[10px] uppercase font-mono tracking-widest text-[#c9a96e]">Editorial Portrait</span>
+                <h3 className="font-serif text-lg text-white">Executive Chef Portrait Photograph</h3>
+                <p className="text-xs text-[#8c887e] mt-1 leading-relaxed">
+                  Featured on the homepage &ldquo;About the Executive Chef&rdquo; section. Automatically compressed to high-efficiency WebP before uploading.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  disabled={portraitLoading}
+                  onClick={() => portraitFileInputRef.current?.click()}
+                  className="px-5 py-2.5 bg-[#c9a96e] hover:bg-[#dfc28d] disabled:opacity-50 text-[#09090b] text-xs uppercase tracking-wider font-semibold transition-all shadow-md flex items-center space-x-2"
+                >
+                  <Camera className="w-3.5 h-3.5" />
+                  <span>{portraitLoading ? 'Compressing & Uploading...' : 'Replace Portrait Photo'}</span>
+                </button>
+                <span className="text-[11px] text-[#8c887e] font-mono">Accepts JPG, PNG, WebP • Auto-compressed</span>
+              </div>
+            </div>
           </div>
 
           <form onSubmit={handleSaveAbout} className="space-y-6">
@@ -2601,9 +2979,11 @@ export default function GalleryManager({
                           accept="image/jpeg,image/png,image/webp,image/jpg"
                           onChange={(e) => {
                             if (e.target.files && e.target.files[0]) {
-                              const f = e.target.files[0];
-                              setRecipeImageFile(f);
-                              setRecipeImagePreview(URL.createObjectURL(f));
+                              const raw = e.target.files[0];
+                              compressImageClientSide(raw, 1920, 0.82).then((compressed) => {
+                                setRecipeImageFile(compressed);
+                                setRecipeImagePreview(URL.createObjectURL(compressed));
+                              });
                             }
                           }}
                           className="hidden"
@@ -2822,6 +3202,492 @@ export default function GalleryManager({
           )}
         </section>
       )}
+
+      {/* ======================================================== */}
+      {/* ------------- TAB: HOME PICTURES (3 HERO) ------------- */}
+      {/* ======================================================== */}
+      {activeTab === 'hero' && (
+        <section className="space-y-8 animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+            <div>
+              <div className="flex items-center space-x-3">
+                <h2 className="font-serif text-2xl text-[#f4efe6]">
+                  Homepage Showcase Pictures ({heroSlides.length})
+                </h2>
+                <span className="px-2.5 py-0.5 bg-[#c9a96e]/10 border border-[#c9a96e]/30 text-[#c9a96e] text-[10px] uppercase font-mono tracking-wider">
+                  Full-Screen Hero Slideshow
+                </span>
+              </div>
+              <p className="text-xs text-[#8c887e] mt-1">
+                The 3 showcase editorial photographs cycling on the homepage hero banner. Re-order, replace pictures, or edit subcaptions with automatic WebP compression.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setIsAddingSlide(true);
+                setNewSlideFile(null);
+                setNewSlidePreview('');
+                setNewSlideSubcaption('');
+                setNewSlideAlt('');
+              }}
+              className="inline-flex items-center space-x-2 px-5 py-2.5 bg-[#c9a96e] hover:bg-[#dfc28d] text-[#09090b] text-xs uppercase tracking-widest font-semibold transition-all shadow-lg self-start sm:self-auto"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Home Picture</span>
+            </button>
+          </div>
+
+          {/* Grid of Home Pictures */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {heroSlides.map((slide, idx) => (
+              <div
+                key={slide.id}
+                className="bg-[#111116] border border-white/10 hover:border-[#c9a96e]/50 transition-all flex flex-col justify-between group shadow-xl"
+              >
+                <div>
+                  {/* Picture Preview */}
+                  <div className="relative aspect-[16/10] bg-black/60 overflow-hidden">
+                    <Image
+                      src={slide.src}
+                      alt={slide.alt || `Home Picture ${idx + 1}`}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute top-3 left-3 px-2 py-1 bg-black/80 backdrop-blur-sm border border-white/10 text-[#c9a96e] text-[10px] font-mono uppercase tracking-wider">
+                      Picture #{idx + 1}
+                    </div>
+                  </div>
+
+                  {/* Info */}
+                  <div className="p-5 space-y-2">
+                    <div className="text-[10px] uppercase font-mono tracking-widest text-[#8c887e]">
+                      Subcaption Overlay
+                    </div>
+                    <div className="font-serif text-sm text-[#f4efe6] line-clamp-2">
+                      &ldquo;{slide.subcaption || 'Precision & Culinary Artistry'}&rdquo;
+                    </div>
+                    {slide.alt && (
+                      <div className="text-[11px] text-[#8c887e] line-clamp-1 italic">
+                        Alt: {slide.alt}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Card Actions */}
+                <div className="p-4 bg-[#0d0d12] border-t border-white/5 flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    disabled={slideLoading}
+                    onClick={() => handleTriggerReplaceSlide(slide.id)}
+                    className="flex-1 py-2 px-3 bg-[#181822] hover:bg-[#222230] text-[#ded8cd] hover:text-[#c9a96e] text-[11px] font-medium border border-white/10 transition-colors flex items-center justify-center space-x-1.5"
+                    title="Replace picture with auto WebP compression"
+                  >
+                    <RefreshCw className="w-3 h-3" />
+                    <span>Replace Image</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOpenEditSlide(slide)}
+                    className="p-2 bg-[#181822] hover:bg-[#222230] text-[#ded8cd] hover:text-[#c9a96e] border border-white/10 transition-colors"
+                    title="Edit caption text"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                  </button>
+
+                  {heroSlides.length > 1 && (
+                    <button
+                      type="button"
+                      disabled={slideLoading}
+                      onClick={() => handleDeleteSlide(slide.id)}
+                      className="p-2 bg-[#181822] hover:bg-red-950/40 text-red-400 hover:text-red-300 border border-red-500/20 transition-colors"
+                      title="Delete picture"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Edit Caption Modal */}
+          {editingSlide && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
+              <div className="bg-[#121218] border border-white/15 w-full max-w-lg p-6 space-y-6 shadow-2xl">
+                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                  <h3 className="font-serif text-lg text-white">Edit Home Picture Details</h3>
+                  <button
+                    type="button"
+                    onClick={() => setEditingSlide(null)}
+                    className="text-[#8c887e] hover:text-white"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleSaveSlideText} className="space-y-4">
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1 font-medium">
+                      Subcaption (Shown in Gold Overlay) *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={slideSubcaption}
+                      onChange={(e) => setSlideSubcaption(e.target.value)}
+                      placeholder="e.g. Precision, Passion & Culinary Innovation"
+                      className="w-full bg-[#181822] border border-white/10 p-3 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1 font-medium">
+                      Accessibility / Alt Tag
+                    </label>
+                    <input
+                      type="text"
+                      value={slideAlt}
+                      onChange={(e) => setSlideAlt(e.target.value)}
+                      placeholder="e.g. Chef Bijaya Ghimire Plating Signature Dish"
+                      className="w-full bg-[#181822] border border-white/10 p-3 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-end space-x-3 pt-3">
+                    <button
+                      type="button"
+                      onClick={() => setEditingSlide(null)}
+                      className="px-4 py-2 border border-white/10 text-xs text-[#8c887e] hover:text-white"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={slideLoading}
+                      className="px-6 py-2 bg-[#c9a96e] hover:bg-[#dfc28d] text-[#09090b] text-xs uppercase tracking-wider font-semibold"
+                    >
+                      {slideLoading ? 'Saving...' : 'Save Caption'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Add Slide Modal */}
+          {isAddingSlide && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
+              <div className="bg-[#121218] border border-white/15 w-full max-w-lg p-6 space-y-6 shadow-2xl">
+                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                  <h3 className="font-serif text-lg text-white">Add New Homepage Picture</h3>
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingSlide(false)}
+                    className="text-[#8c887e] hover:text-white"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleAddSlide} className="space-y-4">
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-2 font-medium">
+                      Select Photograph (Auto-compressed to WebP) *
+                    </label>
+                    <label className="flex flex-col items-center justify-center border-2 border-dashed border-white/15 hover:border-[#c9a96e] p-6 cursor-pointer bg-[#161620] transition-colors">
+                      <Camera className="w-8 h-8 text-[#c9a96e] mb-2" />
+                      <span className="text-xs text-[#ded8cd] font-medium">
+                        {newSlideFile ? newSlideFile.name : 'Click to choose image file'}
+                      </span>
+                      <span className="text-[10px] text-[#8c887e] mt-1">
+                        JPG, PNG, WebP • Auto-compressed before upload
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/jpg"
+                        onChange={async (e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            const raw = e.target.files[0];
+                            const comp = await compressImageClientSide(raw, 2048, 0.85);
+                            setNewSlideFile(comp);
+                            setNewSlidePreview(URL.createObjectURL(comp));
+                          }
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {newSlidePreview && (
+                      <div className="relative aspect-[16/10] mt-3 border border-white/10 overflow-hidden">
+                        <Image src={newSlidePreview} alt="Preview" fill className="object-cover" />
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1 font-medium">
+                      Subcaption Overlay *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newSlideSubcaption}
+                      onChange={(e) => setNewSlideSubcaption(e.target.value)}
+                      placeholder="e.g. Precision, Passion & Culinary Innovation"
+                      className="w-full bg-[#181822] border border-white/10 p-3 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1 font-medium">
+                      Alt / Description
+                    </label>
+                    <input
+                      type="text"
+                      value={newSlideAlt}
+                      onChange={(e) => setNewSlideAlt(e.target.value)}
+                      placeholder="e.g. Executive Chef Culinary Artistry"
+                      className="w-full bg-[#181822] border border-white/10 p-3 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-end space-x-3 pt-3">
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingSlide(false)}
+                      className="px-4 py-2 border border-white/10 text-xs text-[#8c887e] hover:text-white"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={slideLoading || !newSlideFile}
+                      className="px-6 py-2 bg-[#c9a96e] hover:bg-[#dfc28d] disabled:opacity-50 text-[#09090b] text-xs uppercase tracking-wider font-semibold"
+                    >
+                      {slideLoading ? 'Adding...' : 'Add Picture'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* ======================================================== */}
+      {/* ---------- TAB: DIRECT CONTACT & CV MANAGEMENT --------- */}
+      {/* ======================================================== */}
+      {activeTab === 'contact' && (
+        <section className="space-y-8 animate-fade-in">
+          <div className="pb-6 border-b border-white/10">
+            <div className="flex items-center space-x-3">
+              <h2 className="font-serif text-2xl text-[#f4efe6]">
+                Direct Contact Channels &amp; Curriculum Vitae (CV)
+              </h2>
+              <span className="px-2.5 py-0.5 bg-[#c9a96e]/10 border border-[#c9a96e]/30 text-[#c9a96e] text-[10px] uppercase font-mono tracking-wider">
+                Live Portfolio Sync
+              </span>
+            </div>
+            <p className="text-xs text-[#8c887e] mt-1">
+              Configure direct email, phone numbers / WhatsApp, primary deployment base, and upload the official executive CV PDF.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Panel 1: Direct Contact Info Form */}
+            <div className="bg-[#101015] border border-white/10 p-6 md:p-8 shadow-2xl space-y-6">
+              <div className="pb-4 border-b border-white/10">
+                <span className="text-[10px] uppercase font-mono tracking-widest text-[#c9a96e]">Direct Channels</span>
+                <h3 className="font-serif text-xl text-white mt-1">Contact Information</h3>
+                <p className="text-xs text-[#8c887e] mt-1">
+                  Updates the &ldquo;Direct Contact Channels&rdquo; card on the homepage and contact section.
+                </p>
+              </div>
+
+              <form onSubmit={handleSaveContact} className="space-y-5">
+                <div>
+                  <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1.5 font-medium flex items-center space-x-1.5">
+                    <Mail className="w-3.5 h-3.5 text-[#c9a96e]" />
+                    <span>Executive Email Address *</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    placeholder="e.g. chef.ghimire@example.com"
+                    className="w-full bg-[#181822] border border-white/10 px-4 py-3 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1.5 font-medium flex items-center space-x-1.5">
+                    <Phone className="w-3.5 h-3.5 text-[#c9a96e]" />
+                    <span>Primary Phone Number *</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={contactPhone1}
+                    onChange={(e) => setContactPhone1(e.target.value)}
+                    placeholder="e.g. +977 984-1234567"
+                    className="w-full bg-[#181822] border border-white/10 px-4 py-3 text-xs font-mono text-white focus:outline-none focus:border-[#c9a96e]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1.5 font-medium flex items-center space-x-1.5">
+                    <Phone className="w-3.5 h-3.5 text-[#c9a96e]" />
+                    <span>Secondary Phone / WhatsApp</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={contactPhone2}
+                    onChange={(e) => setContactPhone2(e.target.value)}
+                    placeholder="e.g. +977 985-7654321"
+                    className="w-full bg-[#181822] border border-white/10 px-4 py-3 text-xs font-mono text-white focus:outline-none focus:border-[#c9a96e]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-1.5 font-medium flex items-center space-x-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-[#c9a96e]" />
+                    <span>Deployment Base / Primary Location *</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={contactLocation}
+                    onChange={(e) => setContactLocation(e.target.value)}
+                    placeholder="e.g. Kathmandu, Nepal & Global Deployments"
+                    className="w-full bg-[#181822] border border-white/10 px-4 py-3 text-xs text-white focus:outline-none focus:border-[#c9a96e]"
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={savingContact}
+                    className="w-full py-3.5 bg-[#c9a96e] hover:bg-[#dfc28d] disabled:opacity-50 text-[#09090b] text-xs uppercase tracking-widest font-semibold transition-all shadow-lg flex items-center justify-center space-x-2"
+                  >
+                    {savingContact ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Saving Contact Channels...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        <span>Save Contact Information</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Panel 2: Curriculum Vitae (CV) Manager */}
+            <div className="bg-[#101015] border border-white/10 p-6 md:p-8 shadow-2xl space-y-6 flex flex-col justify-between">
+              <div className="space-y-6">
+                <div className="pb-4 border-b border-white/10">
+                  <span className="text-[10px] uppercase font-mono tracking-widest text-[#c9a96e]">Official Document</span>
+                  <h3 className="font-serif text-xl text-white mt-1">Curriculum Vitae (CV)</h3>
+                  <p className="text-xs text-[#8c887e] mt-1">
+                    Manage the downloadable executive resume linked on the homepage hero, about section, and contact card.
+                  </p>
+                </div>
+
+                {/* Current CV status card */}
+                <div className="p-5 bg-[#14141c] border border-white/10 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2 text-xs text-[#ded8cd] font-medium">
+                      <FileText className="w-4 h-4 text-[#c9a96e]" />
+                      <span>Current Active CV File:</span>
+                    </div>
+                    <span className="px-2 py-0.5 bg-emerald-950/60 border border-emerald-800 text-emerald-400 text-[10px] font-mono">
+                      Active
+                    </span>
+                  </div>
+
+                  <div className="font-mono text-xs text-[#8c887e] break-all bg-[#0a0a0d] p-2.5 border border-white/5">
+                    {currentCvUrl}
+                  </div>
+
+                  <div className="pt-2">
+                    <a
+                      href={currentCvUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center space-x-2 px-4 py-2 bg-[#1b1b24] hover:bg-[#252532] text-xs text-[#ded8cd] hover:text-[#c9a96e] border border-white/10 transition-colors"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Preview / Download Current CV</span>
+                      <ExternalLink className="w-3 h-3 ml-1" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* Upload New CV Form */}
+                <form onSubmit={handleUploadCv} className="space-y-4">
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-2 font-medium">
+                      Upload New CV Document (PDF) *
+                    </label>
+
+                    <label className="flex flex-col items-center justify-center border-2 border-dashed border-white/15 hover:border-[#c9a96e] p-6 cursor-pointer bg-[#161620] transition-colors">
+                      <FileText className="w-8 h-8 text-[#c9a96e] mb-2" />
+                      <span className="text-xs text-[#ded8cd] font-medium">
+                        {cvFile ? cvFile.name : 'Select or drop new CV (.pdf)'}
+                      </span>
+                      <span className="text-[10px] text-[#8c887e] mt-1 font-mono">
+                        Accepts official PDF documents up to 25MB
+                      </span>
+                      <input
+                        ref={cvFileInputRef}
+                        type="file"
+                        accept="application/pdf"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            setCvFile(e.target.files[0]);
+                          }
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={uploadingCv || !cvFile}
+                    className="w-full py-3.5 bg-[#c9a96e] hover:bg-[#dfc28d] disabled:opacity-40 text-[#09090b] text-xs uppercase tracking-widest font-semibold transition-all shadow-lg flex items-center justify-center space-x-2"
+                  >
+                    {uploadingCv ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Uploading &amp; Replacing CV...</span>
+                      </>
+                    ) : (
+                      <>
+                        <UploadCloud className="w-4 h-4" />
+                        <span>Upload &amp; Replace CV Document</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+
+              <div className="p-4 bg-[#14141c]/50 border border-white/5 text-[11px] text-[#8c887e] leading-relaxed mt-4">
+                <strong>Note:</strong> Replacing this file immediately updates the &ldquo;Curriculum Vitae&rdquo; download button across all devices for visitors worldwide.
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
     </div>
   );
 }

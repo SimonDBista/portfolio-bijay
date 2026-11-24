@@ -47,6 +47,7 @@ export interface ChefProfile {
     location: string;
     home: string;
     nationality: string;
+    cvUrl?: string;
     languages: { language: string; level: string }[];
   };
   experiences: WorkExperience[];

@@ -8,7 +8,7 @@ import CreationsGallery from '@/components/CreationsGallery';
 import ExperienceTimeline from '@/components/ExperienceTimeline';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
-import { getGalleryItems, getChefProfile, getAwards, getRecipes, getEventFolders } from '@/lib/db';
+import { getGalleryItems, getChefProfile, getAwards, getRecipes, getEventFolders, getHeroSlides } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0; // Always serve fresh dynamic content
@@ -19,14 +19,15 @@ export default function HomePage() {
   const initialAwards = getAwards();
   const initialRecipes = getRecipes();
   const initialFolders = getEventFolders();
+  const initialHeroSlides = getHeroSlides();
 
   return (
     <main className="min-h-screen bg-[#09090b] text-[#f4efe6] selection:bg-[#c9a96e] selection:text-[#09090b]">
       {/* Sticky Luxury Navigation */}
       <Navbar />
 
-      {/* Cinematic Fullscreen Hero with 11, 12, 13, 14 3-second Crossfade */}
-      <HeroSlideshow />
+      {/* Cinematic Fullscreen Hero with 3 Editable Home Pictures */}
+      <HeroSlideshow initialSlides={initialHeroSlides} />
 
       {/* Editorial Biography & Verified Qualifications (Fully Editable in Admin) */}
       <AboutSection profile={chefProfile} />
@@ -43,8 +44,8 @@ export default function HomePage() {
       {/* Career Timeline, Pedagogy & References (Fully Editable in Admin) */}
       <ExperienceTimeline profile={chefProfile} />
 
-      {/* Direct Contact & CV Download */}
-      <ContactSection />
+      {/* Direct Contact & CV Download (Fully Editable in Admin) */}
+      <ContactSection profile={chefProfile} />
 
       {/* Signature Footer */}
       <Footer />

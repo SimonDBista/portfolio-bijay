@@ -1,10 +1,20 @@
 'use client';
 
 import React, { useState } from 'react';
-import { chefData } from '@/data/chefData';
+import { ChefProfile, chefData } from '@/data/chefData';
 import { Mail, Phone, MapPin, Download, Send, CheckCircle2, ArrowUpRight, Loader2, AlertCircle } from 'lucide-react';
 
-export default function ContactSection() {
+interface ContactSectionProps {
+  profile?: ChefProfile;
+}
+
+export default function ContactSection({ profile }: ContactSectionProps) {
+  const contact = profile?.contact || chefData.contact;
+  const email = contact.email || chefData.contact.email;
+  const phones = (contact.phones && contact.phones.length > 0) ? contact.phones : chefData.contact.phones;
+  const location = contact.location || chefData.contact.location;
+  const cvUrl = contact.cvUrl || '/docs/Bijaya_Ghimire_Executive_Chef_CV.pdf';
+
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -80,7 +90,7 @@ export default function ContactSection() {
               <div className="space-y-4 pt-2">
                 {/* Email */}
                 <a
-                  href={`mailto:${chefData.contact.email}`}
+                  href={`mailto:${email}`}
                   className="flex items-start space-x-4 p-4 bg-[#16161d] border border-white/5 hover:border-[#c9a96e]/40 transition-colors group"
                 >
                   <div className="w-10 h-10 rounded-sm bg-[#1e1e28] flex items-center justify-center text-[#c9a96e] group-hover:bg-[#c9a96e] group-hover:text-[#09090b] transition-all">
@@ -89,7 +99,7 @@ export default function ContactSection() {
                   <div>
                     <span className="text-[10px] uppercase tracking-widest text-[#8c887e] block">Email</span>
                     <span className="text-sm text-[#f4efe6] group-hover:text-[#c9a96e] transition-colors break-all">
-                      {chefData.contact.email}
+                      {email}
                     </span>
                   </div>
                 </a>
@@ -103,7 +113,7 @@ export default function ContactSection() {
                     <div>
                       <span className="text-[10px] uppercase tracking-widest text-[#8c887e] block">Phone &bull; WhatsApp</span>
                       <div className="space-y-0.5 mt-0.5">
-                        {chefData.contact.phones.map((phone, idx) => (
+                        {phones.map((phone, idx) => (
                           <a
                             key={idx}
                             href={`tel:${phone.replace(/[^0-9+]/g, '')}`}
@@ -125,7 +135,7 @@ export default function ContactSection() {
                   <div>
                     <span className="text-[10px] uppercase tracking-widest text-[#8c887e] block">Primary Location</span>
                     <span className="text-sm text-[#f4efe6]">
-                      {chefData.contact.location}
+                      {location}
                     </span>
                   </div>
                 </div>
@@ -134,7 +144,7 @@ export default function ContactSection() {
               {/* CV Download CTA */}
               <div className="pt-4 border-t border-white/5">
                 <a
-                  href="/docs/Bijaya_Ghimire_Executive_Chef_CV.pdf"
+                  href={cvUrl}
                   download
                   className="w-full flex items-center justify-center space-x-3 py-3.5 bg-[#c9a96e] hover:bg-[#dfc28d] text-[#09090b] text-xs uppercase tracking-[0.25em] font-semibold transition-all shadow-lg"
                 >

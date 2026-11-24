@@ -23,6 +23,15 @@ const AWARDS_FILE = path.join(process.cwd(), 'data', 'awards.json');
 const RECIPES_FILE = path.join(process.cwd(), 'data', 'recipes.json');
 const FOLDERS_FILE = path.join(process.cwd(), 'data', 'galleryFolders.json');
 const INQUIRIES_FILE = path.join(process.cwd(), 'data', 'inquiries.json');
+const HERO_SLIDES_FILE = path.join(process.cwd(), 'data', 'heroSlides.json');
+
+export interface HeroSlideItem {
+  id: string;
+  src: string;
+  alt: string;
+  subcaption: string;
+  order?: number;
+}
 
 export interface InquiryItem {
   id: string;
@@ -115,6 +124,16 @@ function ensureInquiriesFile(): void {
   }
   if (!fs.existsSync(INQUIRIES_FILE)) {
     fs.writeFileSync(INQUIRIES_FILE, '[]', 'utf-8');
+  }
+}
+
+function ensureHeroSlidesFile(): void {
+  const dir = path.dirname(HERO_SLIDES_FILE);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  if (!fs.existsSync(HERO_SLIDES_FILE)) {
+    fs.writeFileSync(HERO_SLIDES_FILE, '[]', 'utf-8');
   }
 }
 
@@ -314,6 +333,41 @@ export function updateAboutSection(updates: {
   if (updates.fullPhilosophy !== undefined) profile.fullPhilosophy = updates.fullPhilosophy;
   if (updates.stats !== undefined) profile.stats = updates.stats;
 
+  saveChefProfile(profile);
+  return profile;
+}
+
+export function updateContactSection(updates: {
+  email?: string;
+  phones?: string[];
+  location?: string;
+  cvUrl?: string;
+}): ChefProfile {
+  const profile = getChefProfile();
+
+  if (!profile.contact) {
+    profile.contact = {
+      email: '',
+      phones: [],
+      location: '',
+      home: '',
+      nationality: 'Nepalese',
+      languages: []
+    };
+  }
+
+  if (updates.email !== undefined) profile.contact.email = updates.email.trim();
+  if (updates.phones !== undefined) profile.contact.phones = updates.phones;
+  if (updates.location !== undefined) profile.contact.location = updates.location.trim();
+  if (updates.cvUrl !== undefined) profile.contact.cvUrl = updates.cvUrl.trim();
+
+  saveChefProfile(profile);
+  return profile;
+}
+
+export function updateBioImage(bioImage: string): ChefProfile {
+  const profile = getChefProfile();
+  profile.bioImage = bioImage.trim();
   saveChefProfile(profile);
   return profile;
 }
@@ -613,4 +667,56 @@ export function markInquiryRead(id: string): InquiryItem[] {
   const updated = current.map(i => (i.id === id ? { ...i, read: true } : i));
   saveInquiries(updated);
   return updated;
+}
+
+// ---------------- HERO SLIDE OPERATIONS ---------------- //
+
+export function getHeroSlides(): HeroSlideItem[] {
+  ensureHeroSlidesFile();
+  try {
+    const raw = fs.readFileSync(HERO_SLIDES_FILE, 'utf-8');
+    const items: HeroSlideItem[] = JSON.parse(raw);
+    return Array.isArray(items) ? items : [];
+  } catch (error) {
+    console.error('Error reading heroSlides.json:', error);
+    return [];
+  }
+}
+
+export function saveHeroSlides(items: HeroSlideItem[]): void {
+  ensureHeroSlidesFile();
+  try {
+    fs.writeFileSync(HERO_SLIDES_FILE, JSON.stringify(items, null, 2), 'utf-8');
+  } catch (error) {
+    console.error('Error saving heroSlides.json:', error);
+  }
+}
+
+export function addHeroSlide(slide: Omit<HeroSlideItem, 'id'>): HeroSlideItem {
+  const current = getHeroSlides();
+  const newSlide: HeroSlideItem = {
+    ...slide,
+    id: `hero-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    order: slide.order !== undefined ? slide.order : current.length + 1,
+  };
+  const updated = [...current, newSlide];
+  saveHeroSlides(updated);
+  return newSlide;
+}
+
+export function updateHeroSlide(id: string, updates: Partial<HeroSlideItem>): HeroSlideItem | null {
+  const current = getHeroSlides();
+  const index = current.findIndex(s => s.id === id);
+  if (index === -1) return null;
+
+  current[index] = { ...current[index], ...updates };
+  saveHeroSlides(current);
+  return current[index];
+}
+
+export function deleteHeroSlide(id: string): HeroSlideItem[] {
+  const current = getHeroSlides();
+  const filtered = current.filter(s => s.id !== id);
+  saveHeroSlides(filtered);
+  return filtered;
 }

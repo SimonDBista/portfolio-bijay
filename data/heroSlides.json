@@ -1,0 +1,23 @@
+[
+  {
+    "id": "hero-1",
+    "src": "/images/hero/hero-1.jpg",
+    "alt": "Chef Bijaya Ghimire signature culinary creation 11",
+    "subcaption": "Precision & Culinary Artistry",
+    "order": 1
+  },
+  {
+    "id": "hero-2",
+    "src": "/images/hero/hero-2.jpg",
+    "alt": "Chef Bijaya Ghimire fine dining preparation 12",
+    "subcaption": "Modern Gastronomy & Flavor Balance",
+    "order": 2
+  },
+  {
+    "id": "hero-3",
+    "src": "/images/hero/hero-3.jpg",
+    "alt": "Chef Bijaya Ghimire gourmet plating 13",
+    "subcaption": "Architectural Presentation & Craft",
+    "order": 3
+  }
+]

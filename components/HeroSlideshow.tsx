@@ -4,42 +4,35 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowDown, Pause, Play, ChevronRight } from 'lucide-react';
+import { HeroSlideItem } from '@/lib/db';
 
-interface HeroSlide {
-  id: number;
-  src: string;
-  alt: string;
-  subcaption: string;
+interface HeroSlideshowProps {
+  initialSlides?: HeroSlideItem[];
 }
 
-const heroSlides: HeroSlide[] = [
+const defaultHeroSlides: HeroSlideItem[] = [
   {
-    id: 1,
+    id: 'hero-1',
     src: '/images/hero/hero-1.jpg',
     alt: 'Chef Bijaya Ghimire signature culinary creation 11',
     subcaption: 'Precision & Culinary Artistry'
   },
   {
-    id: 2,
+    id: 'hero-2',
     src: '/images/hero/hero-2.jpg',
     alt: 'Chef Bijaya Ghimire fine dining preparation 12',
     subcaption: 'Modern Gastronomy & Flavor Balance'
   },
   {
-    id: 3,
+    id: 'hero-3',
     src: '/images/hero/hero-3.jpg',
     alt: 'Chef Bijaya Ghimire gourmet plating 13',
     subcaption: 'Architectural Presentation & Craft'
-  },
-  {
-    id: 4,
-    src: '/images/hero/hero-4.jpg',
-    alt: 'Chef Bijaya Ghimire executive kitchen craft 14',
-    subcaption: 'Over 8 Years of International Discipline'
   }
 ];
 
-export default function HeroSlideshow() {
+export default function HeroSlideshow({ initialSlides = [] }: HeroSlideshowProps) {
+  const slides = initialSlides.length > 0 ? initialSlides : defaultHeroSlides;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -47,40 +40,42 @@ export default function HeroSlideshow() {
 
   // Preload images into browser memory to eliminate flashing
   useEffect(() => {
-    heroSlides.forEach((slide) => {
+    slides.forEach((slide) => {
       const img = new window.Image();
       img.src = slide.src;
     });
-  }, []);
+  }, [slides]);
 
   // 3-second automatic slide transition
   useEffect(() => {
-    if (!isPlaying) {
+    if (!isPlaying || slides.length === 0) {
       if (timerRef.current) clearInterval(timerRef.current);
       return;
     }
 
     timerRef.current = setInterval(() => {
       setIsTransitioning(true);
-      setCurrentIndex((prev) => (prev + 1) % heroSlides.length);
+      setCurrentIndex((prev) => (prev + 1) % slides.length);
     }, 3000);
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPlaying]);
+  }, [isPlaying, slides.length]);
 
   const handleSelectSlide = (index: number) => {
     setCurrentIndex(index);
     if (timerRef.current) {
       clearInterval(timerRef.current);
-      if (isPlaying) {
+      if (isPlaying && slides.length > 0) {
         timerRef.current = setInterval(() => {
-          setCurrentIndex((prev) => (prev + 1) % heroSlides.length);
+          setCurrentIndex((prev) => (prev + 1) % slides.length);
         }, 3000);
       }
     }
   };
+
+  const currentSlide = slides[currentIndex] || slides[0] || defaultHeroSlides[0];
 
   return (
     <section
@@ -90,7 +85,7 @@ export default function HeroSlideshow() {
     >
       {/* Background Images with Cinematic Ken Burns & Crossfade */}
       <div className="absolute inset-0 z-0">
-        {heroSlides.map((slide, idx) => {
+        {slides.map((slide, idx) => {
           const isActive = idx === currentIndex;
           return (
             <div
@@ -180,7 +175,7 @@ export default function HeroSlideshow() {
       <div className="absolute bottom-6 sm:bottom-10 left-4 sm:left-6 md:left-12 right-4 sm:right-6 md:right-12 z-20 flex items-end justify-between pointer-events-none">
         {/* Active Slide Indicators */}
         <div className="flex items-center space-x-2 sm:space-x-3 pointer-events-auto">
-          {heroSlides.map((slide, idx) => {
+          {slides.map((slide, idx) => {
             const isActive = idx === currentIndex;
             return (
               <button
@@ -223,7 +218,7 @@ export default function HeroSlideshow() {
             Featured Culinary Art
           </p>
           <p className="text-xs font-serif italic text-white/80">
-            {heroSlides[currentIndex].subcaption}
+            {currentSlide.subcaption}
           </p>
         </div>
       </div>
