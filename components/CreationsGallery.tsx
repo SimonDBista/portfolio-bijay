@@ -57,7 +57,9 @@ export default function CreationsGallery({ initialItems }: CreationsGalleryProps
   }, [activeLightboxIndex, filteredItems.length]);
 
   return (
-    <section id="creations" className="py-16 sm:py-24 md:py-36 bg-[#09090b] relative">
+    <section id="gallery" className="py-16 sm:py-24 md:py-36 bg-[#09090b] relative">
+      {/* Anchor alias for backwards compatibility */}
+      <span id="creations" className="sr-only" aria-hidden="true" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
         {/* Section Header */}
         <div className="flex flex-col items-center text-center mb-10 sm:mb-12 md:mb-16">
@@ -65,7 +67,7 @@ export default function CreationsGallery({ initialItems }: CreationsGalleryProps
             Visual Portfolio
           </span>
           <h2 className="font-serif text-2xl sm:text-4xl md:text-5xl font-normal tracking-wide text-[#f4efe6]">
-            Signature Culinary Creations
+            Signature Culinary Gallery
           </h2>
           <div className="w-16 h-[1.5px] bg-[#c9a96e] mt-4 sm:mt-6 mb-4 sm:mb-6" />
           <p className="max-w-2xl text-xs sm:text-sm md:text-base text-[#ded8cd]/80 leading-relaxed font-light">

@@ -29,9 +29,11 @@ export default function Footer() {
         <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-[11px] sm:text-xs uppercase tracking-[0.15em] sm:tracking-[0.2em] max-w-full px-2">
           <Link href="#home" className="hover:text-[#c9a96e] transition-colors">Home</Link>
           <Link href="#about" className="hover:text-[#c9a96e] transition-colors">About</Link>
+          <Link href="#awards" className="hover:text-[#c9a96e] transition-colors">Awards</Link>
+          <Link href="#recipes" className="hover:text-[#c9a96e] transition-colors">Recipes</Link>
+          <Link href="#gallery" className="hover:text-[#c9a96e] transition-colors">Gallery</Link>
           <Link href="#experience" className="hover:text-[#c9a96e] transition-colors">Experience</Link>
           <Link href="#specialties" className="hover:text-[#c9a96e] transition-colors">Specialties</Link>
-          <Link href="#creations" className="hover:text-[#c9a96e] transition-colors">Creations</Link>
           <Link href="#contact" className="hover:text-[#c9a96e] transition-colors">Contact</Link>
           <Link href="/admin/login" className="hover:text-[#c9a96e] transition-colors flex items-center space-x-1">
             <Lock className="w-3 h-3" />

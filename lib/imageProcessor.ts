@@ -1,7 +1,6 @@
 import sharp from 'sharp';
 import path from 'path';
 import fs from 'fs';
-import { v4 as uuidv4 } from 'crypto';
 
 export interface ProcessedImageResult {
   filename: string;
@@ -22,8 +21,12 @@ const ALLOWED_MIME_TYPES = new Set([
   'image/webp',
 ]);
 
-const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB max input size
+const MAX_FILE_SIZE = 35 * 1024 * 1024; // 35MB max raw input size
 
+/**
+ * Compresses, auto-orients, resizes, and converts any uploaded image buffer
+ * to highly-optimized, progressive WebP format with an ultra-lightweight thumbnail.
+ */
 export async function processAndSaveImage(
   buffer: Buffer,
   originalName: string,
@@ -34,7 +37,7 @@ export async function processAndSaveImage(
   }
 
   if (buffer.length > MAX_FILE_SIZE) {
-    throw new Error(`Image size exceeds 25MB limit.`);
+    throw new Error(`Image size exceeds 35MB limit.`);
   }
 
   const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
@@ -50,35 +53,50 @@ export async function processAndSaveImage(
   const mainFilePath = path.join(uploadsDir, mainFilename);
   const thumbFilePath = path.join(uploadsDir, thumbFilename);
 
-  // Read metadata
+  // Read original metadata
   const metadata = await sharp(buffer).metadata();
   const origWidth = metadata.width || 1200;
   const origHeight = metadata.height || 900;
 
-  // 1. Process Main Image: Resize if oversized (max 1920px), convert to WebP, quality 86
+  // 1. Process Main Image:
+  // - Auto-orient based on EXIF
+  // - Resize inside 1920x1920 with high-quality lanczos3 resampling
+  // - Convert to modern compressed WebP with quality 82, effort 5, smartSubsample for crisp culinary detail
   const mainBuffer = await sharp(buffer)
-    .rotate() // auto-orient based on EXIF
+    .rotate()
     .resize({
       width: 1920,
       height: 1920,
       fit: 'inside',
       withoutEnlargement: true,
+      kernel: 'lanczos3',
     })
-    .webp({ quality: 86, effort: 4 })
+    .webp({
+      quality: 82,
+      effort: 5,
+      smartSubsample: true,
+      reductionEffort: 5,
+    })
     .toBuffer();
 
   fs.writeFileSync(mainFilePath, mainBuffer);
 
-  // 2. Process Thumbnail Image: Resize for responsive masonry cards (max 700px), quality 80
+  // 2. Process Thumbnail Image:
+  // - Resize to max 600px width/height for responsive gallery grid loading
+  // - Compressed WebP quality 75, effort 4
   const thumbBuffer = await sharp(buffer)
     .rotate()
     .resize({
-      width: 700,
-      height: 700,
+      width: 600,
+      height: 600,
       fit: 'inside',
       withoutEnlargement: true,
+      kernel: 'lanczos3',
     })
-    .webp({ quality: 80, effort: 3 })
+    .webp({
+      quality: 75,
+      effort: 4,
+    })
     .toBuffer();
 
   fs.writeFileSync(thumbFilePath, thumbBuffer);
@@ -100,4 +118,29 @@ export async function processAndSaveImage(
     format: 'webp',
     sizeBytes: mainBuffer.length,
   };
+}
+
+/**
+ * General helper to compress and optimize any image buffer into WebP with custom maximum dimension and quality.
+ */
+export async function compressImageBuffer(
+  buffer: Buffer,
+  maxDimension: number = 1600,
+  quality: number = 82
+): Promise<Buffer> {
+  return await sharp(buffer)
+    .rotate()
+    .resize({
+      width: maxDimension,
+      height: maxDimension,
+      fit: 'inside',
+      withoutEnlargement: true,
+      kernel: 'lanczos3',
+    })
+    .webp({
+      quality,
+      effort: 5,
+      smartSubsample: true,
+    })
+    .toBuffer();
 }

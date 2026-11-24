@@ -12,9 +12,11 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: 'Home', href: '#home' },
   { label: 'About', href: '#about' },
+  { label: 'Awards', href: '#awards' },
+  { label: 'Recipes', href: '#recipes' },
+  { label: 'Gallery', href: '#gallery' },
   { label: 'Experience', href: '#experience' },
   { label: 'Specialties', href: '#specialties' },
-  { label: 'Creations', href: '#creations' },
   { label: 'Contact', href: '#contact' },
 ];
 
@@ -43,13 +45,13 @@ export default function Navbar() {
       }
 
       // Determine active section
-      const sections = ['home', 'about', 'experience', 'specialties', 'creations', 'contact'];
+      const sections = ['home', 'about', 'awards', 'recipes', 'gallery', 'creations', 'experience', 'specialties', 'contact'];
       for (const section of sections) {
         const el = document.getElementById(section);
         if (el) {
           const rect = el.getBoundingClientRect();
           if (rect.top <= 200 && rect.bottom >= 200) {
-            setActiveSection(section);
+            setActiveSection(section === 'creations' ? 'gallery' : section);
             break;
           }
         }
@@ -63,13 +65,12 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? 'bg-[#09090b]/90 backdrop-blur-md border-b border-[#c9a96e]/20 py-4 shadow-2xl'
-            : 'bg-gradient-to-b from-black/80 via-black/40 to-transparent py-6'
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
+          ? 'bg-[#09090b]/90 backdrop-blur-md border-b border-[#c9a96e]/20 py-4 shadow-2xl'
+          : 'bg-gradient-to-b from-black/80 via-black/40 to-transparent py-6'
+          }`}
       >
-        <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 flex items-center justify-between">
           {/* Brand Logo */}
           <Link
             href="#home"
@@ -84,18 +85,17 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center space-x-5 xl:space-x-8">
+          <nav className="hidden lg:flex items-center space-x-3 xl:space-x-5 2xl:space-x-6">
             {navItems.map((item) => {
               const isActive = activeSection === item.href.replace('#', '');
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`text-[11px] xl:text-xs uppercase tracking-[0.18em] xl:tracking-[0.25em] transition-all relative py-1 ${
-                    isActive
-                      ? 'text-[#c9a96e] font-semibold'
-                      : 'text-[#e2ded6]/80 hover:text-white'
-                  }`}
+                  className={`text-[10.5px] xl:text-[11.5px] 2xl:text-xs uppercase tracking-[0.12em] xl:tracking-[0.18em] transition-all relative py-1 ${isActive
+                    ? 'text-[#c9a96e] font-semibold'
+                    : 'text-[#e2ded6]/80 hover:text-white'
+                    }`}
                 >
                   {item.label}
                   {isActive && (

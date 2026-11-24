@@ -2,9 +2,11 @@ import React from 'react';
 import Navbar from '@/components/Navbar';
 import HeroSlideshow from '@/components/HeroSlideshow';
 import AboutSection from '@/components/AboutSection';
+import AwardsSection from '@/components/AwardsSection';
+import RecipesSection from '@/components/RecipesSection';
+import CreationsGallery from '@/components/CreationsGallery';
 import ExperienceTimeline from '@/components/ExperienceTimeline';
 import SpecialtiesSection from '@/components/SpecialtiesSection';
-import CreationsGallery from '@/components/CreationsGallery';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
 import { getGalleryItems, getChefProfile } from '@/lib/db';
@@ -27,14 +29,20 @@ export default function HomePage() {
       {/* Editorial Biography & Verified Qualifications (Fully Editable in Admin) */}
       <AboutSection profile={chefProfile} />
 
+      {/* Honors, Accreditations & Distinction Awards (Top Section) */}
+      <AwardsSection />
+
+      {/* Signature Master Recipes with Ingredients & Method Drawer (Top Section) */}
+      <RecipesSection />
+
+      {/* Signature Creations Gallery with Lightbox & Category Filters (Top Section) */}
+      <CreationsGallery initialItems={initialGalleryItems} />
+
       {/* Career Timeline, Pedagogy & References (Fully Editable in Admin) */}
       <ExperienceTimeline profile={chefProfile} />
 
       {/* Culinary Repertoire & Disciplines */}
       <SpecialtiesSection />
-
-      {/* Signature Creations Gallery with Lightbox (Fully Editable in Admin) */}
-      <CreationsGallery initialItems={initialGalleryItems} />
 
       {/* Direct Contact & CV Download */}
       <ContactSection />
