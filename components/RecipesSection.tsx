@@ -50,22 +50,20 @@ export default function RecipesSection({ initialRecipes = [] }: RecipesSectionPr
         </div>
 
         {/* Clean Recipe Cards Grid: Picture + Title + Little Description */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 items-start">
           {recipes.map((recipe) => (
             <div
               key={recipe.id}
               className="group bg-[#13121b] border border-[#c9a96e]/20 hover:border-[#c9a96e]/60 transition-all duration-500 shadow-xl flex flex-col overflow-hidden hover:-translate-y-1"
             >
-              {/* Recipe Picture */}
-              <div className="relative w-full aspect-[4/3] overflow-hidden bg-[#181724]">
-                <Image
+              {/* Recipe Picture - Shown in full uploaded size & natural aspect ratio (no cropping) */}
+              <div className="relative w-full bg-[#0d0c12] overflow-hidden flex items-center justify-center border-b border-white/5">
+                <img
                   src={recipe.image || '/images/gallery/creation-04.jpg'}
                   alt={recipe.title}
-                  fill
-                  className="object-cover object-center filter brightness-[0.92] contrast-[1.05] transition-transform duration-700 ease-out group-hover:scale-105"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  className="w-full h-auto object-contain transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+                  loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#13121b] via-transparent to-transparent opacity-60" />
               </div>
 
               {/* Recipe Info: Title + Little Description */}

@@ -2975,14 +2975,13 @@ export default function GalleryManager({
                 className="bg-[#121217] border border-white/10 hover:border-[#c9a96e]/30 transition-all flex flex-col justify-between shadow-xl overflow-hidden"
               >
                 <div>
-                  {/* Recipe Photo */}
-                  <div className="relative aspect-[4/3] bg-black overflow-hidden">
-                    <Image
+                  {/* Recipe Photo - Full uncropped size matching upload */}
+                  <div className="relative w-full bg-[#0a0a0f] overflow-hidden flex items-center justify-center border-b border-white/5">
+                    <img
                       src={recipe.image || '/images/gallery/creation-04.jpg'}
                       alt={recipe.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="w-full h-auto max-h-[420px] object-contain"
+                      loading="lazy"
                     />
                   </div>
 
@@ -3069,12 +3068,11 @@ export default function GalleryManager({
 
                     {/* Image Preview if available */}
                     {(recipeImagePreview || recipeForm.image) && (
-                      <div className="relative aspect-[16/9] w-full bg-black border border-white/10 overflow-hidden mb-2">
-                        <Image
+                      <div className="relative w-full bg-black/60 border border-white/10 overflow-hidden mb-2 flex items-center justify-center p-2">
+                        <img
                           src={recipeImagePreview || recipeForm.image}
                           alt="Recipe Preview"
-                          fill
-                          className="object-cover"
+                          className="w-full h-auto max-h-[300px] object-contain mx-auto"
                         />
                       </div>
                     )}
