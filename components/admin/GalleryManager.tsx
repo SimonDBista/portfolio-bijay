@@ -4,7 +4,7 @@ import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { GalleryItem, AwardItem, RecipeItem, EventFolder } from '@/lib/db';
+import { GalleryItem, AwardItem, RecipeItem, EventFolder, InquiryItem } from '@/lib/db';
 import { ChefProfile, WorkExperience, EducationCert } from '@/data/chefData';
 import {
   UploadCloud,
@@ -36,7 +36,12 @@ import {
   Folder,
   FolderOpen,
   ArrowLeft,
-  Images
+  Images,
+  Inbox,
+  Mail,
+  Phone,
+  Clock,
+  MessageSquare
 } from 'lucide-react';
 
 interface GalleryManagerProps {
@@ -46,6 +51,7 @@ interface GalleryManagerProps {
   initialAwards?: AwardItem[];
   initialRecipes?: RecipeItem[];
   initialFolders?: EventFolder[];
+  initialInquiries?: InquiryItem[];
 }
 
 export default function GalleryManager({
@@ -54,7 +60,8 @@ export default function GalleryManager({
   initialProfile,
   initialAwards = [],
   initialRecipes = [],
-  initialFolders = []
+  initialFolders = [],
+  initialInquiries = []
 }: GalleryManagerProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -62,7 +69,7 @@ export default function GalleryManager({
   const folderFileInputRef = useRef<HTMLInputElement>(null);
 
   // Active Admin Tab
-  const [activeTab, setActiveTab] = useState<'gallery' | 'awards' | 'recipes' | 'about' | 'experience' | 'education'>('gallery');
+  const [activeTab, setActiveTab] = useState<'gallery' | 'awards' | 'recipes' | 'inquiries' | 'about' | 'experience' | 'education'>('gallery');
 
   // Status & Feedback
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -126,6 +133,10 @@ export default function GalleryManager({
   const [recipeImageFile, setRecipeImageFile] = useState<File | null>(null);
   const [recipeImagePreview, setRecipeImagePreview] = useState<string>('');
   const [recipeLoading, setRecipeLoading] = useState(false);
+
+  // ---------------- TAB: INQUIRIES STATE ---------------- //
+  const [inquiries, setInquiries] = useState<InquiryItem[]>(initialInquiries);
+  const [inquiriesLoading, setInquiriesLoading] = useState(false);
 
   // ---------------- TAB 2: ABOUT SECTION STATE ---------------- //
   const [profile, setProfile] = useState<ChefProfile>(initialProfile);
@@ -974,6 +985,54 @@ export default function GalleryManager({
     }
   };
 
+  // ---------------- INQUIRY HANDLERS ---------------- //
+  const handleRefreshInquiries = async () => {
+    setInquiriesLoading(true);
+    try {
+      const res = await fetch('/api/inquiries');
+      const data = await res.json();
+      if (res.ok && data.inquiries) {
+        setInquiries(data.inquiries);
+        setStatusMessage({ type: 'success', text: 'Inquiries refreshed.' });
+      }
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: 'Failed to refresh inquiries.' });
+    } finally {
+      setInquiriesLoading(false);
+    }
+  };
+
+  const handleDeleteInquiry = async (id: string, name: string) => {
+    if (!window.confirm(`Are you sure you want to delete inquiry from "${name}"?`)) return;
+
+    try {
+      const res = await fetch(`/api/inquiries?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete inquiry');
+
+      setInquiries(data.inquiries);
+      setStatusMessage({ type: 'success', text: `Inquiry from "${name}" deleted.` });
+    } catch (err: any) {
+      setStatusMessage({ type: 'error', text: err.message || 'Error deleting inquiry.' });
+    }
+  };
+
+  const handleMarkInquiryRead = async (id: string) => {
+    try {
+      const res = await fetch('/api/inquiries', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, read: true }),
+      });
+      const data = await res.json();
+      if (res.ok && data.inquiries) {
+        setInquiries(data.inquiries);
+      }
+    } catch (err) {
+      console.error('Error marking as read:', err);
+    }
+  };
+
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
     router.push('/admin/login');
@@ -1061,6 +1120,20 @@ export default function GalleryManager({
         >
           <ChefHat className="w-4 h-4" />
           <span>Master Recipes ({recipes.length})</span>
+        </button>
+
+        <button
+          onClick={() => { setActiveTab('inquiries'); setStatusMessage(null); }}
+          className={`flex items-center space-x-2 px-5 py-2.5 text-xs uppercase tracking-wider font-medium transition-all ${activeTab === 'inquiries'
+            ? 'bg-[#c9a96e] text-[#09090b] font-semibold shadow-md'
+            : 'bg-[#121217] text-[#ded8cd]/70 hover:text-white border border-white/5'
+            }`}
+        >
+          <Inbox className="w-4 h-4" />
+          <span>Inquiries ({inquiries.length})</span>
+          {inquiries.some((i) => !i.read) && (
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-1" title="New unread inquiries" />
+          )}
         </button>
 
         <button
@@ -2584,6 +2657,167 @@ export default function GalleryManager({
                   </div>
                 </form>
               </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* ======================================================== */}
+      {/* ---------------- TAB: CLIENT INQUIRIES ------------------ */}
+      {/* ======================================================== */}
+      {activeTab === 'inquiries' && (
+        <section className="space-y-8 animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+            <div>
+              <div className="flex items-center space-x-3">
+                <h2 className="font-serif text-2xl text-[#f4efe6]">
+                  Client Inquiries &amp; Consultations ({inquiries.length})
+                </h2>
+                {inquiries.some((i) => !i.read) && (
+                  <span className="px-2 py-0.5 bg-emerald-950/60 border border-emerald-800 text-emerald-300 text-[10px] uppercase font-mono tracking-wider rounded-sm">
+                    {inquiries.filter((i) => !i.read).length} New Unread
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-[#8c887e] mt-1">
+                Direct messages and culinary service requests transmitted through the homepage contact form.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleRefreshInquiries}
+              disabled={inquiriesLoading}
+              className="inline-flex items-center space-x-2 px-4 py-2 bg-[#1b1b24] hover:bg-[#252532] text-xs text-[#ded8cd] hover:text-[#c9a96e] border border-white/10 transition-colors self-start sm:self-auto"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${inquiriesLoading ? 'animate-spin' : ''}`} />
+              <span>Refresh Inquiries</span>
+            </button>
+          </div>
+
+          {inquiries.length > 0 ? (
+            <div className="space-y-4">
+              {inquiries.map((inq) => {
+                const dateStr = inq.createdAt ? new Date(inq.createdAt).toLocaleString(undefined, {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                }) : 'Recent';
+
+                return (
+                  <div
+                    key={inq.id}
+                    className={`p-6 border transition-all ${
+                      inq.read
+                        ? 'bg-[#121217] border-white/5 hover:border-white/15'
+                        : 'bg-[#14141d] border-[#c9a96e]/40 shadow-xl'
+                    }`}
+                  >
+                    {/* Top Row: Client Name, Inquiry Focus, Date, Status */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-white/5">
+                      <div className="flex items-center space-x-3">
+                        <span className="font-serif text-lg text-[#f4efe6]">
+                          {inq.name}
+                        </span>
+                        {!inq.read && (
+                          <span className="w-2 h-2 rounded-full bg-emerald-400" title="Unread" />
+                        )}
+                        <span className="px-2.5 py-0.5 bg-[#c9a96e]/10 border border-[#c9a96e]/20 text-[10px] uppercase font-mono tracking-wider text-[#c9a96e]">
+                          {inq.inquiryType}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center space-x-2 text-xs text-[#8c887e]">
+                        <Clock className="w-3.5 h-3.5 text-[#8c887e]" />
+                        <span className="font-mono text-[11px]">{dateStr}</span>
+                      </div>
+                    </div>
+
+                    {/* Middle Row: Contact Info (Email, Phone) */}
+                    <div className="flex flex-wrap items-center gap-4 py-3 text-xs">
+                      <a
+                        href={`mailto:${inq.email}?subject=Regarding your inquiry with Chef Bijaya Ghimire`}
+                        className="flex items-center space-x-1.5 text-[#ded8cd] hover:text-[#c9a96e] transition-colors"
+                      >
+                        <Mail className="w-3.5 h-3.5 text-[#c9a96e]" />
+                        <span>{inq.email}</span>
+                      </a>
+
+                      {inq.phone && (
+                        <a
+                          href={`tel:${inq.phone.replace(/[^0-9+]/g, '')}`}
+                          className="flex items-center space-x-1.5 text-[#ded8cd] hover:text-[#c9a96e] transition-colors font-mono"
+                        >
+                          <Phone className="w-3.5 h-3.5 text-[#c9a96e]" />
+                          <span>{inq.phone}</span>
+                        </a>
+                      )}
+                    </div>
+
+                    {/* Message Body */}
+                    <div className="bg-[#0e0e13] p-4 border border-white/5 rounded-sm my-2">
+                      <p className="text-xs sm:text-sm text-[#ded8cd] font-light leading-relaxed whitespace-pre-wrap">
+                        {inq.message}
+                      </p>
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="flex items-center justify-between pt-3 border-t border-white/5 text-xs">
+                      <div className="flex items-center space-x-3">
+                        {!inq.read ? (
+                          <button
+                            type="button"
+                            onClick={() => handleMarkInquiryRead(inq.id)}
+                            className="text-[#8c887e] hover:text-[#ded8cd] text-[11px] flex items-center space-x-1"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            <span>Mark as read</span>
+                          </button>
+                        ) : (
+                          <span className="text-[#8c887e] text-[11px] flex items-center space-x-1">
+                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Read</span>
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <a
+                          href={`mailto:${inq.email}?subject=Regarding your inquiry (${inq.inquiryType}) - Chef Bijaya Ghimire&body=Dear ${encodeURIComponent(inq.name)},%0D%0A%0D%0AThank you for reaching out.%0D%0A%0D%0ABest regards,%0D%0AChef Bijaya Ghimire`}
+                          onClick={() => handleMarkInquiryRead(inq.id)}
+                          className="px-3.5 py-1.5 bg-[#c9a96e] hover:bg-[#dfc28d] text-[#09090b] text-xs font-semibold uppercase tracking-wider transition-colors flex items-center space-x-1.5"
+                        >
+                          <Mail className="w-3.5 h-3.5" />
+                          <span>Reply via Email</span>
+                        </a>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteInquiry(inq.id, inq.name)}
+                          className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-950/40 border border-red-500/20 transition-colors"
+                          title="Delete inquiry"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="bg-[#101015] border border-white/10 p-12 text-center space-y-3">
+              <div className="w-12 h-12 rounded-full bg-[#1e1e28] text-[#c9a96e] flex items-center justify-center mx-auto mb-2">
+                <Inbox className="w-6 h-6" />
+              </div>
+              <h3 className="font-serif text-xl text-[#f4efe6]">
+                No Inquiries Yet
+              </h3>
+              <p className="text-xs text-[#8c887e] max-w-md mx-auto leading-relaxed">
+                When visitors or event managers submit the consultation form on the homepage, their messages will appear here in real time with client details and quick reply options.
+              </p>
             </div>
           )}
         </section>

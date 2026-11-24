@@ -22,6 +22,18 @@ const PROFILE_FILE = path.join(process.cwd(), 'data', 'chefProfile.json');
 const AWARDS_FILE = path.join(process.cwd(), 'data', 'awards.json');
 const RECIPES_FILE = path.join(process.cwd(), 'data', 'recipes.json');
 const FOLDERS_FILE = path.join(process.cwd(), 'data', 'galleryFolders.json');
+const INQUIRIES_FILE = path.join(process.cwd(), 'data', 'inquiries.json');
+
+export interface InquiryItem {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  inquiryType: string;
+  message: string;
+  createdAt: string;
+  read?: boolean;
+}
 
 export interface AwardItem {
   id: string;
@@ -93,6 +105,16 @@ function ensureFoldersFile(): void {
   }
   if (!fs.existsSync(FOLDERS_FILE)) {
     fs.writeFileSync(FOLDERS_FILE, '[]', 'utf-8');
+  }
+}
+
+function ensureInquiriesFile(): void {
+  const dir = path.dirname(INQUIRIES_FILE);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  if (!fs.existsSync(INQUIRIES_FILE)) {
+    fs.writeFileSync(INQUIRIES_FILE, '[]', 'utf-8');
   }
 }
 
@@ -541,4 +563,54 @@ export function deleteImageFromEventFolder(folderId: string, imageId: string): E
   current[index].images = (current[index].images || []).filter(img => img.id !== imageId);
   saveEventFolders(current);
   return current[index];
+}
+
+// ---------------- INQUIRY OPERATIONS ---------------- //
+
+export function getInquiries(): InquiryItem[] {
+  ensureInquiriesFile();
+  try {
+    const raw = fs.readFileSync(INQUIRIES_FILE, 'utf-8');
+    const items: InquiryItem[] = JSON.parse(raw);
+    return Array.isArray(items) ? items : [];
+  } catch (error) {
+    console.error('Error reading inquiries.json:', error);
+    return [];
+  }
+}
+
+export function saveInquiries(items: InquiryItem[]): void {
+  ensureInquiriesFile();
+  try {
+    fs.writeFileSync(INQUIRIES_FILE, JSON.stringify(items, null, 2), 'utf-8');
+  } catch (error) {
+    console.error('Error saving inquiries.json:', error);
+  }
+}
+
+export function addInquiry(inquiry: Omit<InquiryItem, 'id' | 'createdAt'>): InquiryItem {
+  const current = getInquiries();
+  const newItem: InquiryItem = {
+    ...inquiry,
+    id: `inq-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    createdAt: new Date().toISOString(),
+    read: false,
+  };
+  const updated = [newItem, ...current];
+  saveInquiries(updated);
+  return newItem;
+}
+
+export function deleteInquiry(id: string): InquiryItem[] {
+  const current = getInquiries();
+  const filtered = current.filter(i => i.id !== id);
+  saveInquiries(filtered);
+  return filtered;
+}
+
+export function markInquiryRead(id: string): InquiryItem[] {
+  const current = getInquiries();
+  const updated = current.map(i => (i.id === id ? { ...i, read: true } : i));
+  saveInquiries(updated);
+  return updated;
 }

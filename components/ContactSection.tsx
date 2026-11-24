@@ -2,21 +2,48 @@
 
 import React, { useState } from 'react';
 import { chefData } from '@/data/chefData';
-import { Mail, Phone, MapPin, Download, Send, CheckCircle2, ArrowUpRight } from 'lucide-react';
+import { Mail, Phone, MapPin, Download, Send, CheckCircle2, ArrowUpRight, Loader2, AlertCircle } from 'lucide-react';
 
 export default function ContactSection() {
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     inquiryType: 'Private Dining & Masterclass',
     message: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setFormSubmitted(true);
-    // User message feedback
+    setSubmitting(true);
+    setErrorMessage('');
+
+    try {
+      const res = await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to submit inquiry.');
+
+      setFormSubmitted(true);
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        inquiryType: 'Private Dining & Masterclass',
+        message: ''
+      });
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Unable to submit your message. Please reach out via email or phone.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -148,6 +175,13 @@ export default function ContactSection() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {errorMessage && (
+                    <div className="p-4 bg-red-950/40 border border-red-800 text-xs text-red-200 flex items-start space-x-2">
+                      <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                      <span>{errorMessage}</span>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="contact-name" className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-2 font-medium">
@@ -181,23 +215,40 @@ export default function ContactSection() {
                     </div>
                   </div>
 
-                  <div>
-                    <label htmlFor="contact-inquiry" className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-2 font-medium">
-                      Inquiry Focus
-                    </label>
-                    <select
-                      id="contact-inquiry"
-                      name="inquiryType"
-                      value={formData.inquiryType}
-                      onChange={(e) => setFormData({ ...formData, inquiryType: e.target.value })}
-                      className="w-full bg-[#181820] border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#c9a96e] transition-colors"
-                    >
-                      <option value="Private Dining & Masterclass">Private Dining &amp; Masterclass</option>
-                      <option value="Executive Chef / CDP Opportunity">Executive Chef / CDP Opportunity</option>
-                      <option value="Restaurant Menu Development">Restaurant Menu Development</option>
-                      <option value="Culinary Staff Instruction">Culinary Staff Instruction &amp; Training</option>
-                      <option value="Food Safety & HACCP Audit">Food Safety &amp; HACCP Consulting</option>
-                    </select>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="contact-phone" className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-2 font-medium">
+                        Phone / WhatsApp (Optional)
+                      </label>
+                      <input
+                        id="contact-phone"
+                        name="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        placeholder="e.g. +977 9801234567"
+                        className="w-full bg-[#181820] border border-white/10 px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#c9a96e] transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="contact-inquiry" className="block text-[11px] uppercase tracking-widest text-[#8c887e] mb-2 font-medium">
+                        Inquiry Focus
+                      </label>
+                      <select
+                        id="contact-inquiry"
+                        name="inquiryType"
+                        value={formData.inquiryType}
+                        onChange={(e) => setFormData({ ...formData, inquiryType: e.target.value })}
+                        className="w-full bg-[#181820] border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#c9a96e] transition-colors"
+                      >
+                        <option value="Private Dining & Masterclass">Private Dining &amp; Masterclass</option>
+                        <option value="Executive Chef / CDP Opportunity">Executive Chef / CDP Opportunity</option>
+                        <option value="Restaurant Menu Development">Restaurant Menu Development</option>
+                        <option value="Culinary Staff Instruction">Culinary Staff Instruction &amp; Training</option>
+                        <option value="Food Safety & HACCP Audit">Food Safety &amp; HACCP Consulting</option>
+                      </select>
+                    </div>
                   </div>
 
                   <div>
@@ -218,10 +269,20 @@ export default function ContactSection() {
 
                   <button
                     type="submit"
-                    className="w-full sm:w-auto px-8 py-3.5 bg-[#c9a96e] hover:bg-[#dfc28d] text-[#09090b] text-xs uppercase tracking-[0.25em] font-semibold transition-all flex items-center justify-center space-x-2 shadow-lg"
+                    disabled={submitting}
+                    className="w-full sm:w-auto px-8 py-3.5 bg-[#c9a96e] hover:bg-[#dfc28d] disabled:opacity-50 text-[#09090b] text-xs uppercase tracking-[0.25em] font-semibold transition-all flex items-center justify-center space-x-2 shadow-lg"
                   >
-                    <span>Transmit Inquiry</span>
-                    <Send className="w-3.5 h-3.5" />
+                    {submitting ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Transmitting Inquiry...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Transmit Inquiry</span>
+                        <Send className="w-3.5 h-3.5" />
+                      </>
+                    )}
                   </button>
                 </form>
               )}

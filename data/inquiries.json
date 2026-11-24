@@ -1,0 +1,22 @@
+[
+  {
+    "id": "inq-1732431000000-sample1",
+    "name": "Marcus Vance",
+    "email": "m.vance@luxuryhospitalitygroup.com",
+    "phone": "+965 9876 5432",
+    "inquiryType": "Executive Chef / CDP Opportunity",
+    "message": "Dear Chef Bijaya, we are opening a flagship Mediterranean fine-dining concept in Kuwait City and would like to discuss an Executive Chef brigade leadership engagement with you.",
+    "createdAt": "2026-11-23T14:30:00.000Z",
+    "read": false
+  },
+  {
+    "id": "inq-1732432000000-sample2",
+    "name": "Elena Rostova",
+    "email": "elena.r@gourmetevents.org",
+    "phone": "+977 9801234567",
+    "inquiryType": "Private Dining & Masterclass",
+    "message": "We would like to book Chef Bijaya for an exclusive 7-course private tasting dinner for 16 VIP guests in Kathmandu next month. Please let us know your availability and menu curation options.",
+    "createdAt": "2026-11-24T09:15:00.000Z",
+    "read": false
+  }
+]

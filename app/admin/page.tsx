@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getAdminSession } from '@/lib/auth';
-import { getGalleryItems, getChefProfile, getAwards, getRecipes, getEventFolders } from '@/lib/db';
+import { getGalleryItems, getChefProfile, getAwards, getRecipes, getEventFolders, getInquiries } from '@/lib/db';
 import GalleryManager from '@/components/admin/GalleryManager';
 
 export const dynamic = 'force-dynamic';
@@ -17,6 +17,7 @@ export default function AdminDashboardPage() {
   const initialAwards = getAwards();
   const initialRecipes = getRecipes();
   const initialFolders = getEventFolders();
+  const initialInquiries = getInquiries();
 
   return (
     <div className="min-h-screen bg-[#070709] text-[#f4efe6]">
@@ -27,6 +28,7 @@ export default function AdminDashboardPage() {
         initialAwards={initialAwards}
         initialRecipes={initialRecipes}
         initialFolders={initialFolders}
+        initialInquiries={initialInquiries}
       />
     </div>
   );
