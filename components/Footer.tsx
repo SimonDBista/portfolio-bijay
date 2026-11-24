@@ -33,7 +33,6 @@ export default function Footer() {
           <Link href="#recipes" className="hover:text-[#c9a96e] transition-colors">Recipes</Link>
           <Link href="#gallery" className="hover:text-[#c9a96e] transition-colors">Gallery</Link>
           <Link href="#experience" className="hover:text-[#c9a96e] transition-colors">Experience</Link>
-          <Link href="#specialties" className="hover:text-[#c9a96e] transition-colors">Specialties</Link>
           <Link href="#contact" className="hover:text-[#c9a96e] transition-colors">Contact</Link>
           <Link href="/admin/login" className="hover:text-[#c9a96e] transition-colors flex items-center space-x-1">
             <Lock className="w-3 h-3" />

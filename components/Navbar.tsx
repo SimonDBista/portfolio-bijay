@@ -16,7 +16,6 @@ const navItems: NavItem[] = [
   { label: 'Recipes', href: '#recipes' },
   { label: 'Gallery', href: '#gallery' },
   { label: 'Experience', href: '#experience' },
-  { label: 'Specialties', href: '#specialties' },
   { label: 'Contact', href: '#contact' },
 ];
 
@@ -45,7 +44,7 @@ export default function Navbar() {
       }
 
       // Determine active section
-      const sections = ['home', 'about', 'awards', 'recipes', 'gallery', 'creations', 'experience', 'specialties', 'contact'];
+      const sections = ['home', 'about', 'awards', 'recipes', 'gallery', 'creations', 'experience', 'contact'];
       for (const section of sections) {
         const el = document.getElementById(section);
         if (el) {

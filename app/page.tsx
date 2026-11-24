@@ -6,7 +6,6 @@ import AwardsSection from '@/components/AwardsSection';
 import RecipesSection from '@/components/RecipesSection';
 import CreationsGallery from '@/components/CreationsGallery';
 import ExperienceTimeline from '@/components/ExperienceTimeline';
-import SpecialtiesSection from '@/components/SpecialtiesSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
 import { getGalleryItems, getChefProfile, getAwards, getRecipes, getEventFolders } from '@/lib/db';
@@ -43,9 +42,6 @@ export default function HomePage() {
 
       {/* Career Timeline, Pedagogy & References (Fully Editable in Admin) */}
       <ExperienceTimeline profile={chefProfile} />
-
-      {/* Culinary Repertoire & Disciplines */}
-      <SpecialtiesSection />
 
       {/* Direct Contact & CV Download */}
       <ContactSection />
